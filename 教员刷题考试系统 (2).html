@@ -1,0 +1,1133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>教员口试背诵练习</title>
+<style>
+:root {--bg:#f6f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--primary:#2563eb;--primary2:#1d4ed8;--ok:#16a34a;--bad:#dc2626;--border:#e5e7eb;--soft:#eef2ff;}
+* {box-sizing:border-box}
+body {margin:0;font-family:"Microsoft YaHei", system-ui, -apple-system, Segoe UI, sans-serif;background:linear-gradient(180deg,#f8fafc,#eef2ff 60%,#f8fafc);color:var(--text);line-height:1.65;}
+header {position:sticky;top:0;z-index:10;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.wrap {max-width:1100px;margin:0 auto;padding:18px;}
+.hero {display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h1 {font-size:24px;margin:0 0 4px}
+.sub {color:var(--muted);font-size:14px}
+.stats {display:flex;gap:10px;flex-wrap:wrap}
+.pill {background:var(--soft);border:1px solid #dbeafe;border-radius:999px;padding:6px 12px;font-size:13px;color:#1e40af}
+.controls {display:grid;grid-template-columns:1fr auto auto auto;gap:10px;margin-top:14px}
+input, select, textarea {border:1px solid var(--border);border-radius:12px;padding:10px 12px;font:inherit;background:white}
+button {border:0;border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer;background:var(--primary);color:white;box-shadow:0 6px 18px rgba(37,99,235,.18)}
+button:hover {background:var(--primary2)}
+button.secondary {background:white;color:var(--text);border:1px solid var(--border);box-shadow:none}
+button.good {background:var(--ok)} button.danger {background:var(--bad)}
+main .grid {display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:start}
+.side, .card {background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:20px;box-shadow:0 12px 35px rgba(15,23,42,.06)}
+.side {position:sticky;top:118px;padding:16px}
+.card {padding:22px;margin-bottom:16px}
+.progress {height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:10px 0}
+.bar {height:100%;width:0;background:linear-gradient(90deg,#2563eb,#22c55e);transition:.25s}
+.section-title {font-size:13px;color:var(--muted);margin-top:12px}
+.bigq {font-size:22px;font-weight:800;margin:6px 0 14px}
+.answer {white-space:pre-wrap;background:#f8fafc;border:1px solid var(--border);border-radius:16px;padding:16px;margin-top:12px}
+.ai-box {white-space:pre-wrap;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:16px;margin-top:12px}
+.ai-box.warn {background:#fffbeb;border-color:#fde68a}
+.ai-box.bad {background:#fef2f2;border-color:#fecaca}
+.ai-settings {display:grid;gap:8px;margin-top:10px}
+.ai-settings input {width:100%;font-size:13px;padding:8px 10px}
+.mini {font-size:12px;color:var(--muted)}
+.hidden {display:none!important}
+.list {display:grid;gap:12px}
+.qa {padding:16px;border:1px solid var(--border);border-radius:16px;background:white}
+.qa h3 {margin:0 0 8px;font-size:17px}
+.qa details {margin-top:8px}
+small {color:var(--muted)}
+.row {display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mode-tab {display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.mode-tab button.active {background:#111827}
+.kbd {font-family:ui-monospace,Consolas,monospace;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:1px 6px}
+.footer {text-align:center;color:var(--muted);padding:30px}
+.memory-box {background:#f8fafc;border:1px dashed #cbd5e1;border-radius:14px;padding:10px;margin-top:10px}
+.memory-box b {display:block;margin-bottom:4px}
+.tiny-btn {padding:7px 9px;font-size:12px;border-radius:10px}
+@media (max-width:860px) {.controls{grid-template-columns:1fr 1fr} main .grid{grid-template-columns:1fr} .side{position:static}}
+@media print {header,.side,.mode-tab,.no-print{display:none!important} body{background:white} .card,.qa{box-shadow:none;break-inside:avoid}}
+
+/* GSAP 动效增强：保留离线可用，联网时启用更顺滑的入场与切换动画 */
+.card, .qa, .side, header, .mode-tab button, button, input, select, textarea {will-change:transform, opacity}
+.card, .qa {transform-origin:center top}
+button {transition:transform .18s ease, box-shadow .18s ease, background .18s ease}
+button:hover {transform:translateY(-2px);box-shadow:0 10px 24px rgba(37,99,235,.16)}
+button.secondary:hover {box-shadow:0 10px 22px rgba(15,23,42,.08)}
+.qa {transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease}
+.qa:hover {transform:translateY(-3px);box-shadow:0 14px 32px rgba(15,23,42,.08);border-color:#bfdbfe}
+.bigq {background:linear-gradient(90deg,#1d4ed8,#111827);-webkit-background-clip:text;background-clip:text;color:transparent}
+.answer, .ai-box {transform-origin:top center}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+
+/* ===== Apple Design System 风格重构：通透、克制、层次、60fps 动效 ===== */
+:root{
+  --bg:#f5f7fb;
+  --card:rgba(255,255,255,.66);
+  --text:#1d1d1f;
+  --muted:#6e6e73;
+  --primary:#007aff;
+  --primary2:#0a84ff;
+  --ok:#34c759;
+  --bad:#ff3b30;
+  --border:rgba(60,60,67,.14);
+  --soft:rgba(0,122,255,.10);
+  --glass:rgba(255,255,255,.62);
+  --glass-strong:rgba(255,255,255,.78);
+  --shadow:0 18px 50px rgba(0,0,0,.08), 0 1px 0 rgba(255,255,255,.68) inset;
+  --shadow-hover:0 28px 70px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.78) inset;
+  --apple-ease:cubic-bezier(.25,.1,.25,1);
+  --apple-spring:cubic-bezier(.2,.8,.2,1);
+}
+html{scroll-behavior:smooth;background:#f5f7fb;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 12% -8%, rgba(0,122,255,.18), transparent 32%),
+    radial-gradient(circle at 88% 8%, rgba(88,86,214,.13), transparent 30%),
+    radial-gradient(circle at 50% 105%, rgba(52,199,89,.10), transparent 34%),
+    linear-gradient(180deg,#fbfcff 0%,#eef3ff 52%,#f7f8fb 100%);
+  letter-spacing:-.015em;
+  -webkit-font-smoothing:antialiased;
+  overflow-y:overlay;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background:linear-gradient(120deg,rgba(255,255,255,.40),rgba(255,255,255,0) 38%,rgba(255,255,255,.32));
+  transform:translateZ(0);
+}
+header{
+  background:rgba(255,255,255,.52)!important;
+  backdrop-filter:saturate(180%) blur(28px);
+  -webkit-backdrop-filter:saturate(180%) blur(28px);
+  border-bottom:1px solid rgba(60,60,67,.12);
+  transition:padding .38s var(--apple-ease), background .38s var(--apple-ease), box-shadow .38s var(--apple-ease), border-color .38s var(--apple-ease);
+}
+header.is-scrolled{background:rgba(255,255,255,.78)!important;box-shadow:0 12px 40px rgba(0,0,0,.055);border-color:rgba(60,60,67,.18);}
+header.is-scrolled .wrap{padding-top:12px;padding-bottom:12px;}
+.wrap{max-width:1180px;padding:20px;transition:padding .38s var(--apple-ease);}
+h1{font-size:clamp(28px,4vw,54px);line-height:1.04;font-weight:800;letter-spacing:-.055em;background:linear-gradient(180deg,#1d1d1f,#3a3a3c);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.sub{max-width:760px;color:rgba(29,29,31,.62);font-size:15px;}
+.pill{background:rgba(255,255,255,.56);border:1px solid rgba(0,122,255,.16);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:#0057d9;box-shadow:0 8px 22px rgba(0,122,255,.07);}
+.controls{gap:12px;}
+input,select,textarea{
+  background:rgba(255,255,255,.72)!important;
+  border:1px solid rgba(60,60,67,.16)!important;
+  border-radius:18px!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.68) inset, 0 10px 26px rgba(0,0,0,.035);
+  transition:border-color .24s var(--apple-ease), box-shadow .24s var(--apple-ease), transform .24s var(--apple-ease), background .24s var(--apple-ease);
+  outline:none;
+}
+textarea{resize:vertical;min-height:148px;}
+input:focus,select:focus,textarea:focus{
+  border-color:rgba(0,122,255,.45)!important;
+  box-shadow:0 0 0 5px rgba(0,122,255,.11), 0 16px 36px rgba(0,122,255,.08);
+  background:rgba(255,255,255,.88)!important;
+}
+button{
+  border-radius:18px!important;
+  font-weight:650;
+  letter-spacing:-.02em;
+  background:linear-gradient(180deg,#0a84ff,#007aff)!important;
+  box-shadow:0 14px 30px rgba(0,122,255,.22),0 1px 0 rgba(255,255,255,.35) inset!important;
+  transform:translate3d(0,0,0);
+  transition:transform .22s var(--apple-spring), box-shadow .22s var(--apple-ease), filter .22s var(--apple-ease), background .22s var(--apple-ease)!important;
+  touch-action:manipulation;
+}
+button:hover{transform:translate3d(0,-2px,0) scale(1.01);filter:saturate(1.06);box-shadow:0 20px 44px rgba(0,122,255,.28),0 1px 0 rgba(255,255,255,.38) inset!important;}
+button:active{transform:translate3d(0,1px,0) scale(.985);transition-duration:.09s!important;}
+button.secondary{background:rgba(255,255,255,.66)!important;color:#1d1d1f!important;border:1px solid rgba(60,60,67,.14)!important;box-shadow:0 10px 26px rgba(0,0,0,.045),0 1px 0 rgba(255,255,255,.78) inset!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
+button.secondary:hover{box-shadow:0 18px 42px rgba(0,0,0,.075),0 1px 0 rgba(255,255,255,.86) inset!important;}
+button.good{background:linear-gradient(180deg,#34c759,#24b44a)!important;box-shadow:0 14px 30px rgba(52,199,89,.22),0 1px 0 rgba(255,255,255,.35) inset!important;}
+button.danger{background:linear-gradient(180deg,#ff453a,#ff3b30)!important;box-shadow:0 14px 30px rgba(255,59,48,.20),0 1px 0 rgba(255,255,255,.35) inset!important;}
+main .grid{grid-template-columns:minmax(260px,310px) 1fr;gap:24px;}
+.side,.card,.qa,.memory-box,.answer,.ai-box{
+  background:var(--glass)!important;
+  border:1px solid rgba(255,255,255,.64)!important;
+  box-shadow:var(--shadow)!important;
+  backdrop-filter:saturate(180%) blur(28px);
+  -webkit-backdrop-filter:saturate(180%) blur(28px);
+}
+.side{top:132px;padding:22px;border-radius:28px;max-height:calc(100vh - 180px);overflow-y:auto;overflow-x:hidden;}
+.card{padding:clamp(22px,3vw,34px);border-radius:32px;margin-bottom:20px;overflow:hidden;position:relative;}
+.card::before,.qa::before,.side::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.52),rgba(255,255,255,0) 45%);opacity:.72;}
+.qa{position:relative;padding:20px;border-radius:24px;transition:transform .32s var(--apple-spring),box-shadow .32s var(--apple-ease),border-color .32s var(--apple-ease)!important;}
+.qa:hover,.card:hover{transform:translate3d(0,-3px,0);box-shadow:var(--shadow-hover)!important;}
+.bigq{font-size:clamp(24px,2.6vw,36px);line-height:1.18;font-weight:800;letter-spacing:-.045em;background:linear-gradient(180deg,#1d1d1f,#48484a)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;}
+.answer,.ai-box{border-radius:24px;padding:18px 20px;background:rgba(255,255,255,.54)!important;}
+.ai-box{background:rgba(52,199,89,.10)!important;border-color:rgba(52,199,89,.24)!important;}
+.ai-box.warn{background:rgba(255,204,0,.12)!important;border-color:rgba(255,204,0,.28)!important;}
+.ai-box.bad{background:rgba(255,59,48,.10)!important;border-color:rgba(255,59,48,.24)!important;}
+.progress{height:12px;background:rgba(60,60,67,.12);box-shadow:inset 0 1px 2px rgba(0,0,0,.06);}
+.bar{background:linear-gradient(90deg,#007aff,#34c759);box-shadow:0 0 20px rgba(0,122,255,.28);}
+.mode-tab{position:relative;gap:10px;}
+.mode-tab button{background:rgba(255,255,255,.58)!important;color:#1d1d1f!important;border:1px solid rgba(255,255,255,.64)!important;box-shadow:0 10px 26px rgba(0,0,0,.045),0 1px 0 rgba(255,255,255,.78) inset!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.mode-tab button.active{background:linear-gradient(180deg,#1d1d1f,#343437)!important;color:white!important;box-shadow:0 18px 42px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.18) inset!important;}
+.kbd{background:rgba(255,255,255,.7);border:1px solid rgba(60,60,67,.16);border-radius:8px;box-shadow:0 1px 0 rgba(255,255,255,.8) inset;}
+::-webkit-scrollbar{width:12px;height:12px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(60,60,67,.22);border:4px solid transparent;border-radius:999px;background-clip:content-box}::-webkit-scrollbar-thumb:hover{background:rgba(60,60,67,.32);border:3px solid transparent;background-clip:content-box}
+@media (max-width:860px){.wrap{padding:14px}.controls{grid-template-columns:1fr}.hero{align-items:flex-start}.stats{width:100%}main .grid{grid-template-columns:1fr;gap:16px}.card{border-radius:26px}.mode-tab{position:sticky;top:76px;z-index:8;background:rgba(245,247,251,.62);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:10px 0}}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.card:hover,.qa:hover,button:hover{transform:none!important}}
+
+
+/* ===== 新增互动特效：动态光斑、鼠标跟随、答题反馈、微交互 ===== */
+.ambient-layer{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.orb{position:absolute;width:34vmax;height:34vmax;border-radius:50%;filter:blur(30px);opacity:.38;mix-blend-mode:multiply;animation:floatOrb 16s var(--apple-ease) infinite alternate}
+.orb-a{left:-12vmax;top:4vmax;background:rgba(0,122,255,.34);animation-duration:18s}
+.orb-b{right:-10vmax;top:12vmax;background:rgba(175,82,222,.24);animation-duration:22s;animation-delay:-6s}
+.orb-c{left:26vmax;bottom:-18vmax;background:rgba(52,199,89,.22);animation-duration:24s;animation-delay:-11s}
+@keyframes floatOrb{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(5vmax,-3vmax,0) scale(1.12)}}
+.cursor-glow{position:fixed;width:220px;height:220px;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(0,122,255,.14),rgba(0,122,255,0) 64%);transform:translate3d(-50%,-50%,0);opacity:0;transition:opacity .25s ease}
+.sparkle{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(0,122,255,.38);box-shadow:0 0 18px rgba(0,122,255,.45);pointer-events:none;animation:sparklePop .75s ease-out forwards}
+@keyframes sparklePop{0%{transform:translate(-50%,-50%) scale(.3);opacity:0}18%{opacity:1}100%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0}}
+.floating-coach{position:fixed;right:20px;bottom:20px;z-index:20;width:min(320px,calc(100vw - 40px));padding:14px 16px;border-radius:24px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.72);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);box-shadow:0 24px 60px rgba(0,0,0,.12);transform:translateY(16px);opacity:0;transition:opacity .35s var(--apple-ease),transform .35s var(--apple-ease)}
+.floating-coach.show{opacity:1;transform:translateY(0)}
+.floating-coach b{display:block;margin-bottom:2px}
+.floating-coach .coach-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.floating-coach button{padding:7px 10px;font-size:12px;border-radius:12px!important}
+.ring-card{display:grid;grid-template-columns:78px 1fr;gap:12px;align-items:center;margin-top:14px;padding:12px;border-radius:22px;background:rgba(255,255,255,.48);border:1px solid rgba(255,255,255,.6)}
+.progress-ring{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#007aff var(--ring,0deg),rgba(60,60,67,.12) 0);box-shadow:0 10px 22px rgba(0,122,255,.12) inset}
+.progress-ring::before{content:"";position:absolute;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.82)}
+.progress-ring span{position:relative;font-weight:800;color:#1d1d1f}
+.focus-tools{margin-top:12px;display:grid;gap:8px}
+.focus-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border-radius:16px;background:rgba(255,255,255,.45);border:1px solid rgba(60,60,67,.10);font-size:13px}
+.focus-chip input{width:auto!important;box-shadow:none!important}
+button.ripple-on{position:relative;overflow:hidden}
+.ripple-dot{position:absolute;border-radius:50%;transform:translate(-50%,-50%) scale(0);background:rgba(255,255,255,.55);pointer-events:none;animation:ripple .58s ease-out forwards}
+@keyframes ripple{to{transform:translate(-50%,-50%) scale(18);opacity:0}}
+body.focus-mode header, body.focus-mode .mode-tab, body.focus-mode .footer{opacity:.28;transition:opacity .25s ease}
+body.focus-mode header:hover, body.focus-mode .mode-tab:hover{opacity:1}
+.confetti-piece{position:fixed;top:-12px;width:8px;height:14px;border-radius:3px;z-index:999;pointer-events:none;animation:confettiFall 1.25s linear forwards;background:hsl(var(--h),90%,60%)}
+@keyframes confettiFall{to{transform:translate3d(var(--x),105vh,0) rotate(720deg);opacity:.1}}
+@media (max-width:860px){.floating-coach{right:12px;bottom:12px}.cursor-glow{display:none}.ring-card{grid-template-columns:64px 1fr}.progress-ring{width:64px;height:64px}.progress-ring::before{width:48px;height:48px}}
+@media print{.ambient-layer,.cursor-glow,.floating-coach,.sparkle,.confetti-piece{display:none!important}}
+
+
+
+/* ===== Liquid Glass React 组件方案移植：所有原按键统一为流体液态玻璃 UI ===== */
+:root{
+  --lg-blur:3px;
+  --lg-radius:24px;
+  --lg-elastic:cubic-bezier(0.175, 0.885, 0.32, 2.2);
+  --lg-glow-blue:rgba(0,122,255,.30);
+  --lg-glow-dark:rgba(0,0,0,.16);
+}
+button,
+button.secondary,
+button.good,
+button.danger,
+.mode-tab button,
+.tiny-btn{
+  --mx:50%;
+  --my:50%;
+  --mx-num:.5;
+  --my-num:.5;
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  border-radius:var(--lg-radius)!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  background:transparent!important;
+  color:#fff!important;
+  text-shadow:0 1px 10px rgba(0,0,0,.18);
+  box-shadow:
+    0 6px 6px rgba(0,0,0,.16),
+    0 0 20px rgba(0,0,0,.10),
+    0 18px 46px rgba(0,122,255,.16)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  transform:translate3d(0,0,0);
+  transform-style:preserve-3d;
+  transition:
+    transform .70s var(--lg-elastic),
+    padding .70s var(--lg-elastic),
+    border-radius .70s var(--lg-elastic),
+    box-shadow .70s var(--lg-elastic),
+    filter .70s var(--lg-elastic)!important;
+}
+button.liquid-glass-btn{
+  min-height:42px;
+}
+button.liquid-glass-btn > .liquid-content{
+  position:relative;
+  z-index:30;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.38em;
+  width:100%;
+  height:100%;
+  transition:transform .70s var(--lg-elastic), color .35s ease, text-shadow .35s ease;
+}
+button.liquid-glass-btn:hover > .liquid-content{
+  transform:scale(.955);
+}
+button.secondary,
+.mode-tab button,
+.tiny-btn{
+  color:#1d1d1f!important;
+  text-shadow:0 1px 12px rgba(255,255,255,.42);
+}
+button.good,
+button.danger,
+.mode-tab button.active{
+  color:#fff!important;
+}
+button .liquid-filter-layer,
+button .liquid-tint-layer,
+button .liquid-edge-layer,
+button .liquid-caustic-layer,
+button .liquid-shine{
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+}
+button .liquid-filter-layer{
+  z-index:0;
+  overflow:hidden;
+  backdrop-filter:blur(var(--lg-blur)) saturate(1.65);
+  -webkit-backdrop-filter:blur(var(--lg-blur)) saturate(1.65);
+  filter:url(#glass-distortion);
+  isolation:isolate;
+  transform:translateZ(0);
+}
+button .liquid-tint-layer{
+  z-index:10;
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.78), rgba(255,255,255,.28) 13%, transparent 31%),
+    linear-gradient(135deg, rgba(255,255,255,.25), rgba(255,255,255,.10) 46%, rgba(255,255,255,.24));
+}
+button:not(.secondary):not(.good):not(.danger):not(.active) .liquid-tint-layer{
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.76), transparent 0 14%, rgba(255,255,255,0) 38%),
+    linear-gradient(180deg, rgba(10,132,255,.72), rgba(0,94,255,.58)),
+    linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.05) 48%, rgba(255,255,255,.22));
+}
+button.secondary .liquid-tint-layer,
+.mode-tab button .liquid-tint-layer,
+.tiny-btn .liquid-tint-layer{
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.96), transparent 0 17%, rgba(255,255,255,0) 40%),
+    linear-gradient(135deg, rgba(255,255,255,.48), rgba(255,255,255,.17) 48%, rgba(255,255,255,.36));
+}
+button.good .liquid-tint-layer{
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.76), transparent 0 14%, rgba(255,255,255,0) 38%),
+    linear-gradient(180deg, rgba(52,199,89,.70), rgba(28,164,73,.56)),
+    linear-gradient(135deg, rgba(255,255,255,.24), rgba(255,255,255,.05) 48%, rgba(255,255,255,.18));
+}
+button.danger .liquid-tint-layer{
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.76), transparent 0 14%, rgba(255,255,255,0) 38%),
+    linear-gradient(180deg, rgba(255,69,58,.72), rgba(214,39,32,.58)),
+    linear-gradient(135deg, rgba(255,255,255,.24), rgba(255,255,255,.05) 48%, rgba(255,255,255,.18));
+}
+.mode-tab button.active .liquid-tint-layer{
+  background:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.58), transparent 0 16%, rgba(255,255,255,0) 40%),
+    linear-gradient(180deg, rgba(29,29,31,.76), rgba(52,52,55,.66)),
+    linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04) 48%, rgba(255,255,255,.12));
+}
+button .liquid-edge-layer{
+  z-index:20;
+  overflow:hidden;
+  box-shadow:
+    inset 2px 2px 1px 0 rgba(255,255,255,.52),
+    inset -1px -1px 1px 1px rgba(255,255,255,.48),
+    inset 0 0 22px rgba(255,255,255,.16);
+}
+button .liquid-edge-layer::before{
+  content:"";
+  position:absolute;
+  inset:-35%;
+  background:
+    conic-gradient(from 180deg at var(--mx) var(--my),
+      rgba(255,255,255,0),
+      rgba(255,255,255,.68),
+      rgba(0,229,255,.32),
+      rgba(255,0,153,.26),
+      rgba(255,255,255,0));
+  opacity:.52;
+  mix-blend-mode:screen;
+  transform:translate3d(calc((var(--mx-num) - .5) * 18px), calc((var(--my-num) - .5) * 18px), 0);
+  filter:blur(.4px) saturate(1.45);
+}
+button .liquid-caustic-layer{
+  z-index:24;
+  opacity:.58;
+  background:
+    linear-gradient(115deg, rgba(255,255,255,.62), transparent 24%, transparent 62%, rgba(255,255,255,.28)),
+    radial-gradient(130px 82px at var(--mx) var(--my), rgba(255,255,255,.42), transparent 64%);
+  transform:translate3d(calc((var(--mx-num) - .5) * -7px), calc((var(--my-num) - .5) * -7px), 0);
+}
+button:hover,
+button.secondary:hover,
+.mode-tab button:hover,
+.tiny-btn:hover{
+  border-radius:30px!important;
+  transform:translate3d(0,-3px,0) scale(1.04)!important;
+  filter:saturate(1.14) contrast(1.03);
+  border-color:rgba(255,255,255,.76)!important;
+  box-shadow:
+    0 8px 8px rgba(0,0,0,.18),
+    0 0 28px rgba(0,0,0,.12),
+    0 30px 72px rgba(0,122,255,.24)!important;
+}
+button.secondary:hover,
+.mode-tab button:hover,
+.tiny-btn:hover{
+  box-shadow:
+    0 8px 8px rgba(0,0,0,.16),
+    0 0 28px rgba(0,0,0,.10),
+    0 30px 72px rgba(15,23,42,.16)!important;
+}
+button.good:hover{box-shadow:0 8px 8px rgba(0,0,0,.16),0 0 28px rgba(0,0,0,.10),0 30px 72px rgba(52,199,89,.24)!important;}
+button.danger:hover{box-shadow:0 8px 8px rgba(0,0,0,.16),0 0 28px rgba(0,0,0,.10),0 30px 72px rgba(255,59,48,.22)!important;}
+button:active,
+button.secondary:active,
+.mode-tab button:active,
+.tiny-btn:active{
+  transform:translate3d(0,1px,0) scale(.965)!important;
+  filter:saturate(1.28) brightness(1.04);
+  transition-duration:.10s!important;
+}
+button .liquid-shine{
+  z-index:26;
+  width:46%;
+  height:160%;
+  left:-52%;
+  top:-30%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.48), transparent);
+  transform:translateX(-120%) rotate(18deg);
+  opacity:0;
+  filter:blur(.2px);
+}
+button:hover .liquid-shine{animation:liquidShine 1.18s ease forwards;}
+@keyframes liquidShine{
+  0%{transform:translateX(-145%) rotate(18deg);opacity:0}
+  18%{opacity:.95}
+  100%{transform:translateX(390%) rotate(18deg);opacity:0}
+}
+.liquid-blob{
+  position:absolute;
+  z-index:25;
+  width:12px;height:12px;
+  border-radius:999px;
+  pointer-events:none;
+  background:radial-gradient(circle, rgba(255,255,255,.88), rgba(255,255,255,.34) 42%, transparent 70%);
+  filter:blur(.6px);
+  transform:translate(-50%,-50%) scale(0);
+  animation:liquidBlob .76s ease-out forwards;
+}
+@keyframes liquidBlob{
+  0%{opacity:.95;transform:translate(-50%,-50%) scale(.25)}
+  55%{opacity:.34;transform:translate(-50%,-50%) scale(8.5)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(14)}
+}
+@media (prefers-reduced-motion: reduce){
+  button .liquid-shine,.liquid-blob{display:none!important}
+  button:hover,button.secondary:hover,.mode-tab button:hover,.tiny-btn:hover{transform:none!important}
+}
+
+
+
+
+/* ===== 完整题库沉浸式刷题：整页只保留题目与答案，键盘/点击区域翻题 ===== */
+body.immersive-active{overflow:hidden;background:#0b1020!important;}
+body.immersive-active header,
+body.immersive-active .footer,
+body.immersive-active .floating-coach,
+body.immersive-active .cursor-glow,
+body.immersive-active .ambient-layer{display:none!important;}
+body.immersive-active main{filter:blur(6px);pointer-events:none;user-select:none;}
+.immersive-view{position:fixed;inset:0;z-index:9999;display:none;background:radial-gradient(ellipse at 50% 40%,rgba(15,23,42,.6),rgba(4,8,18,.92));color:#f8fafc;overflow:hidden;}
+body.immersive-active .immersive-view{display:flex;align-items:center;justify-content:center;}
+.immersive-shell{width:min(980px,86vw);max-height:88vh;display:grid;gap:clamp(26px,4vh,44px);align-content:center;background:rgba(255,255,255,.04);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:clamp(28px,4vh,48px) clamp(24px,4vw,44px);}
+.immersive-question{font-size:clamp(30px,5vw,62px);line-height:1.18;font-weight:850;letter-spacing:-.05em;white-space:pre-wrap;text-wrap:pretty;will-change:transform,opacity,filter;contain:content;}
+.immersive-answer{font-size:clamp(20px,2.4vw,34px);line-height:1.72;white-space:pre-wrap;color:rgba(248,250,252,.88);padding-top:clamp(18px,3vh,30px);border-top:1px solid rgba(255,255,255,.18);will-change:transform,opacity,filter;contain:content;}
+.immersive-nav-hint{position:fixed;bottom:clamp(14px,3vh,28px);left:50%;transform:translateX(-50%);z-index:10001;display:flex;gap:8px;align-items:center;color:rgba(255,255,255,.42);font-size:13px;letter-spacing:.04em;user-select:none;pointer-events:none;opacity:0;transition:opacity .5s;}
+.immersive-active .immersive-nav-hint{opacity:1;}
+.immersive-nav-hint kbd{border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:2px 8px;font-family:inherit;font-size:12px;color:rgba(255,255,255,.6);}
+.immersive-progress{position:fixed;top:clamp(10px,2vh,20px);left:50%;transform:translateX(-50%);z-index:10001;display:flex;gap:6px;opacity:0;transition:opacity .5s;}
+.immersive-active .immersive-progress{opacity:1;}
+.immersive-progress-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .35s cubic-bezier(0.16,1,0.3,1),transform .35s cubic-bezier(0.16,1,0.3,1);}
+.immersive-progress-dot.active{background:rgba(255,255,255,.72);transform:scale(1.55);}
+.immersive-hit{position:fixed;top:0;bottom:0;width:32vw;z-index:10000;cursor:pointer;background:transparent;}
+.immersive-hit.prev{left:0}.immersive-hit.next{right:0}
+.immersive-hit.exit{left:32vw;right:32vw;top:0;height:18vh;width:auto;bottom:auto;cursor:zoom-out;}
+@media (max-width:720px){.immersive-shell{width:88vw}.immersive-question{font-size:clamp(26px,8vw,44px)}.immersive-answer{font-size:clamp(18px,5vw,26px)}}
+@media print{.immersive-view{display:none!important}}
+
+</style>
+</head>
+<body>
+<svg class="liquid-glass-svg" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+    <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence"/>
+    <feComponentTransfer in="turbulence" result="mapped">
+      <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5"/>
+      <feFuncG type="gamma" amplitude="0" exponent="1" offset="0"/>
+      <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5"/>
+    </feComponentTransfer>
+    <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap"/>
+    <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lighting-color="white" result="specLight">
+      <fePointLight x="-200" y="-200" z="300"/>
+    </feSpecularLighting>
+    <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage"/>
+    <feDisplacementMap in="SourceGraphic" in2="softMap" scale="45" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+<div class="ambient-layer" aria-hidden="true"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div></div>
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+<div class="immersive-view" id="immersiveView" aria-live="polite">
+  <div class="immersive-hit prev" onclick="immersivePrev()" aria-hidden="true"></div>
+  <div class="immersive-hit next" onclick="immersiveNext()" aria-hidden="true"></div>
+  <div class="immersive-hit exit" ondblclick="exitImmersive()" aria-hidden="true"></div>
+  <div class="immersive-shell">
+    <div class="immersive-question" id="immersiveQuestion"></div>
+    <div class="immersive-answer" id="immersiveAnswer"></div>
+  </div>
+  <div class="immersive-progress" id="immersiveProgress"></div>
+  <div class="immersive-nav-hint">
+    <kbd>&larr;</kbd> <kbd>&rarr;</kbd> 或点击左右切换 &nbsp;&middot;&nbsp; 双击顶部退出
+  </div>
+</div>
+<div class="floating-coach no-print" id="floatingCoach"><b id="coachTitle">练习助手</b><span id="coachText">开始背诵后，我会提示进度和连续答对数。</span><div class="coach-actions"><button class="secondary" id="coachHideBtn">收起</button><button id="coachFocusBtn">专注模式</button></div></div>
+<header><div class="wrap">
+  <div class="hero"><div><h1>教员口试背诵练习</h1><div class="sub">按原文题库生成；每 10 题为一组，学习完自动随机提问本组 10 题，并支持真人教员式点评答案与记忆模式。</div></div><div class="stats"><span class="pill" id="countPill"></span><span class="pill" id="groupPill"></span><span class="pill" id="scorePill">得分：0/0</span></div></div>
+  <div class="controls no-print"><input id="search" placeholder="搜索题目或答案…" /><select id="sectionFilter"><option value="">全部分类</option></select><button class="secondary" onclick="window.print()">打印/另存 PDF</button><button class="secondary" id="resetBtn">重置进度</button></div>
+</div></header>
+<main class="wrap">
+  <div class="mode-tab no-print"><button id="learnTab" class="active">按 10 题背诵</button><button id="examTab">考试模式</button><button id="quizTab">随机提问</button><button id="allTab">完整题库浏览</button></div>
+  <div class="grid">
+    <aside class="side no-print">
+      <b>使用方法</b>
+      <p>1. 在“按 10 题背诵”中先看本组 10 道题。<br>2. 点击“我已背完这 10 题”。<br>3. 系统会随机提问这 10 题，答完后进入下一组。</p>
+      <div class="section-title">当前组进度</div><div class="progress"><div class="bar" id="progressBar"></div></div><small id="progressText"></small>
+      <div class="ring-card">
+        <div class="progress-ring" id="progressRing" style="--ring:0deg"><span id="ringText">0%</span></div>
+        <div><b>今日挑战</b><br><small id="challengeText">完成 1 组练习，保持连续答对。</small></div>
+      </div>
+      <div class="focus-tools">
+        <label class="focus-chip"><span>专注模式：弱化导航与页脚</span><input id="focusModeToggle" type="checkbox"></label>
+        <label class="focus-chip"><span>答对庆祝特效</span><input id="celebrateToggle" type="checkbox" checked></label>
+      </div>
+      <div class="memory-box">
+        <b>记忆模式</b>
+        <label style="display:flex;gap:8px;align-items:center;margin:6px 0"><input id="memoryMode" type="checkbox" style="width:auto"> 记录每题掌握情况</label>
+        <small id="memoryStats">已练 0 题｜已掌握 0 题｜错题 0 题</small>
+        <div class="row" style="margin-top:8px">
+          <button class="secondary tiny-btn" id="wrongBookBtn">错题复习</button>
+          <button class="secondary tiny-btn" id="exportMemoryBtn">导出记忆</button>
+          <button class="secondary tiny-btn" id="importMemoryBtn">导入记忆</button>
+        </div>
+        <input id="memoryImportFile" type="file" accept="application/json" class="hidden">
+        <p class="mini" style="margin:8px 0 0">换文件名、换浏览器或清缓存可能读不到旧记录；导出记忆文件后可恢复。</p>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
+      <b>教员式 AI 点评设置</b>
+      <div class="ai-settings">
+        <input id="aiBaseUrl" placeholder="API 接入地址">
+        <input id="aiApiKey" placeholder="API Key" type="password">
+        <input id="aiModel" placeholder="模型名，例如 astron-code-latest" list="modelList"><datalist id="modelList"><option value="astron-code-latest"></datalist>
+        <button class="secondary" id="saveAiBtn">保存 AI 设置</button>
+      </div>
+      <p class="mini">提示：本地 HTML 中保存 API Key 会有泄露风险，请勿把带 Key 的文件发给别人。</p>
+      <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
+      <p><span class="kbd">空格</span> 可在练习时显示答案；<span class="kbd">Enter</span> 下一题。</p>
+    </aside>
+    <section id="app"></section>
+  </div>
+</main>
+<div class="footer">本页面可离线使用，练习记录保存在当前浏览器；建议定期导出“记忆文件”备份。</div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script>
+const QUESTIONS = [{"id": 1, "sourceNumber": 1, "section": "未分类", "question": "定点转弯，协调转弯，自适应协调转弯，都有什么区别？（固）", "answer": "定点转弯，旋翼在悬停状态下转弯，会精确通过每个GPS位置点，在每个位置点会减速、悬停，停留，停留的时间可以设置。\n协调转弯，飞行速度、油门基本不变，旋翼会偏离GPS位置点，可能会在航线拐弯的外侧。\n自适应协调转弯，飞行速度、油门会随航线转弯而减速，旋翼会偏离GPS位置点，但不会出现在航线拐弯的外侧。固定翼只使用协调转弯。"}, {"id": 2, "sourceNumber": 2, "section": "未分类", "question": "如何保证数传链路在使用中的稳定性和安全性？", "answer": "(1)地面调试阶段有条件的话要进行最大数据量下的拉距实验，并熟悉各种天线的性能。\n(2)飞控要带链路中断返航功能，并设定好中断难复判断时间。\n(3)在飞行场要调查航线沿途重要。干扰源，并作避让措施。\n(4)起飞前检查电台、天线、馈线、电台电池，是否有脱落、断裂，电压不够等状态。"}, {"id": 3, "sourceNumber": 3, "section": "未分类", "question": "优云系统持续作业中有哪些具体应用？", "answer": "申报飞行计划、获取禁飞区信息、获取气象资料、统计训练时间、统计作业面积等等。"}, {"id": 4, "sourceNumber": 4, "section": "未分类", "question": "高海拔地区作业是选择两叶桨还是三叶桨，为什么？", "answer": "两叶桨，因为两叶桨更平稳、效率更高，选用大直径小螺距的两叶桨。"}, {"id": 5, "sourceNumber": 5, "section": "未分类", "question": "PID控制的三个字母分别代表什么含义？", "answer": "P：比例；飞控修正补偿的频率。决定飞机倾斜多大角度飞控开始修正，P越高飞控在越小的倾斜角度开始修正，修正次数增加。\nI：积分；飞控修正补偿的强度。决定飞控修正到位的快慢，i越高修正到位越快。D：微分；飞控修正补偿的幅度。决定飞控修正的角度大小。"}, {"id": 6, "sourceNumber": 6, "section": "未分类", "question": "能否使用高KV的电机带动远大于适配桨大小的桨，为什么？？", "answer": "不可以，因为高KV的电机相对同级别的低KV电机来说，转速快但扭力小，如果使用高KV配大桨，要么根本不能正常运转，要么桨转速不够不能离地，要么使电机过烫而烧毁引发飞行事故。"}, {"id": 7, "sourceNumber": 7, "section": "未分类", "question": "电动动力系统由哪几部分组成？", "answer": "动力电池；电子调速器；动力电机；螺旋桨。"}, {"id": 8, "sourceNumber": 8, "section": "未分类", "question": "执行飞行任务前，对无人机的检查准备工作包括哪些？", "answer": "①检查电池电量；②飞行器外观检查，各机载设备零部件外观及连接，螺旋桨是否安装正确；③检查遥控器与地面站，遥控器各开关位置是否正确，遥杆位置是否正确，地面站电量是否充足，软件是否完备，地面设备连接是否可靠；④开机顺序是否正确：遥控器→无人机→控制站；⑤遥控器开机，所选模型是否正确，飞行模式是否正确等等。"}, {"id": 9, "sourceNumber": 9, "section": "未分类", "question": "飞行器飞行过程中，主要观测地面站哪些数据？", "answer": "飞控电压，飞行高度，GPS等星数，姿态，空速等。"}, {"id": 10, "sourceNumber": 10, "section": "未分类", "question": "无人机地面起飞前检查时，遥控器推油门，油门舵机不响应或旋翼电机不旋转，可能是由哪些原因造成？", "answer": "控制信号：遥控器没有对频、遥控器或接收机故障、接收机与飞控线路松动、飞控与电调线动路松动"}, {"id": 11, "sourceNumber": 11, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "保持油门持续爬升，电机功率会增加还是减小？为什么？", "answer": "不变。因为飞机的重量是不变的。影响功率的是载荷重量，不是舵量。"}, {"id": 12, "sourceNumber": 12, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "遥控器上什么是模拟控制量、开关控制量，一般用来干什么？", "answer": "第一问答案要点:杆、钮等连续的是模拟量，拨动的是开关控制量。\n第二问答案要点:模拟用来操作姿态、舵面或设备连续动作，开关用来控制模式切换、开伞、一键返航等。"}, {"id": 13, "sourceNumber": 13, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "保持油门持续爬升，电机转速会增加还是减小？为什么？", "answer": "转速先升高，后下降。因为高度越高空气密度越小，为了保持爬升，电机转速提高，随后因电池电压下降，转速降低。"}, {"id": 14, "sourceNumber": 14, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "飞控有哪些传感器？", "answer": "GPS(位置高度速度）\n三轴陀螺仪包含《姿态传感器（是感知飞机倾斜程度的）、角速度计（测量飞机角速度的）》\n三轴加速度计（测量飞机各轴加速度的）\n气压高度计（测量飞机高度的）\n温度传感器（感知飞控温度的）\nPMU（管理电源电压的模块）\nLED（调参和显示状态）\n指南针（提供方向）。"}, {"id": 15, "sourceNumber": 15, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "电调的几个作用？", "answer": "直流变交流；\n充当BEC（降压模块）给飞控供电；\n通过改变供电电压调节电机转速；\n通过改变供电电流调节电机扭矩；\n接收和反馈控制信号。\n或答：直流变交流改变电机转速改变电压给电机供电刹车稳压降压BEC输\n出向飞控反馈电机参数"}, {"id": 16, "sourceNumber": 16, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "多轴最大上升和最大下降速度，为什么？", "answer": "以大疆为例:多轴最大上升速度5m/s，下降速3m/s，为了保证安全，限制速度，为后续操作预留反应时间。"}, {"id": 17, "sourceNumber": 17, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "旋翼类怎样教新学员飞行，为什么？", "answer": "教新学员；第一教油门，因为是起飞的基础；第二教升降，因为起飞对尾，学习升降控制飞机保护自己；第三教副翼，可以控制飞机在一定范围内；最后教方向，结合其他通道完成动作。"}, {"id": 18, "sourceNumber": 18, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "固定翼如何教学员", "answer": "1升降，2副翼，3油门，4方向"}, {"id": 19, "sourceNumber": 19, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "三叶桨与两叶桨的区别和各自优点？（KV值同类型题）", "answer": "两叶桨：操纵灵敏度比较低，平稳，效率高，载重大，省电，一般用在工业无人机，大载荷飞机。\n三叶桨；操纵灵敏度高反应快，速度快，机动性好，费电，一般用在航模和竞技穿越机。\n20.锂离子电池、锂铁电池、镍氢电池的优缺点\nA.锂离子重量中、容量大、寿命短\nB.锂铁电池重量大、容量中、寿命长\nC.镍氢电池重量小、容量小、寿命中"}, {"id": 20, "sourceNumber": 20, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "IMU的五个作用？（IMU叫做惯性测量单元）", "answer": "1.测量飞机的角速度\n2.测量飞机的加速度\n3.感知飞机的方位变化和速度变化\n4.解算飞机在三维空间中的姿态\n5.调整并恢复飞机的姿态"}, {"id": 21, "sourceNumber": 21, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "电机规格：4015和2040（扁粗型和细长型电机）各适用于什么方面的无人机？", "answer": "4015是扁粗型电机，低转速、大扭矩，适用于载重无人机，如植保机；\n2040是细长型电机，高转速、扭矩小、灵活，适用于航模、竞技类无人机。如穿\n越机"}, {"id": 22, "sourceNumber": 22, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "六轴无人机，载重8公斤、挂载摄像头、爬2千米、悬停2分钟，能不能完成？（前提是可以飞行二十分钟）", "answer": "以零度飞控控制的六轴无人机为例，它的最大上升速度5米每秒，下降速度2米每秒。所以2000米除以5等于400秒，2000米除以2等于1000秒，悬停2分钟等于120秒400加1000加120等于1520在除以60等于25.333，而随着海拔的升高，空气密度和温度的降低，更加加剧了电量消耗，所以不能完成"}, {"id": 23, "sourceNumber": 23, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "夏天和冬天相比哪个环境的飞行器续航时间长？不考虑电池，只考虑夏天和冬天。", "answer": "是冬天，因为冬天气温度低，空气密度大，螺旋桨升力大，效率高。"}, {"id": 24, "sourceNumber": 24, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "直升机和多旋翼的飞行做功区别，以及优缺点？", "answer": "直升机通过变螺距改变升力，多旋翼通过变速改变升力；\n直升机飞行灵活、飞行速度快，多旋翼飞行稳定，飞行速度慢；\n直升机结构复杂，多旋翼结构简单；\n直升机通过尾桨改变航向，多旋翼通过改变顺逆点机的转速改变航向；直升机桨尖速度快，更危险"}, {"id": 25, "sourceNumber": 25, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "GPS原理", "answer": "各星与地面GPS接受机都有统一的标准时间，各星向外广播发送这个时间及本星的位置（星历），地面GPS接受机根据收到的各星位置与时间差反推计算出自己的位置。"}, {"id": 26, "sourceNumber": 26, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "简述无人机飞控怎么实现姿态解算或感知姿态？", "answer": "使用卡尔曼滤波算法采集加速度计的线性加速度，陀螺仪的角速率和磁场信息、GPS信息。其中将角速率和加速度使用四元数法进行捷联惯导解算姿态，使用磁场和GPS进行融合解算修正"}, {"id": 27, "sourceNumber": 27, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "伺服舵机由那几部分构成？", "answer": "外壳、控制电路、电机、减速齿轮组、电位器。"}, {"id": 28, "sourceNumber": 28, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "桨材质特点？", "answer": "A.碳纤：效率适中、高价、耐用；B.塑胶：低效、低成本、较耐用。C.木质：高效、价格适中、易损；"}, {"id": 29, "sourceNumber": 29, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "按你的理解，起飞重量1公斤，飞行10分钟的四轴配多大电机、多大桨、多大电池，为什么？", "answer": "电机型号2210/桨1140电池/3s2200MAH锂聚合物电池\n起飞重量1公斤，大概符合的机型是轴距350~400的四旋翼，市场上比较符合的成品机型为大疆精灵系列（1.8kg、轴距350mm）电池：4s6000mah、2236电机、1045桨"}, {"id": 30, "sourceNumber": 30, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "四冲程与两冲程的原理、特点和优缺点（固定翼）", "answer": "点火一次活塞上下一次是二冲程，点火一次活塞上下两次是四冲程；四冲程每个汽缸前都有2个节气门杆；四冲程发动机由于结构复杂，所以体积和重量相对较大，价格也贵，两冲程发动机结构简单，体积小，价格也便宜些。"}, {"id": 31, "sourceNumber": 31, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "飞控系统由哪几部分组成？", "answer": "1、处理器；2、传感器（三轴陀螺、三轴加速度计、三轴磁力计、GPS、气压高度计、空速传）感器）（超声波定高、视觉定高、激光测距、等等）；3、伺服设备（舵机、电调）"}, {"id": 32, "sourceNumber": 32, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "飞机上测量高度的传感器都有哪些，使用什么原理", "answer": "1、气压计（相对高度）；2、超声波（真实高度）；3、GPS（海拔高度）4.激光测距雷达（点云反馈）5.视觉传感器（视觉算法反馈）6.RTK（实时差分相对高度）"}, {"id": 33, "sourceNumber": 33, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "怎么调遥控器灵敏度", "answer": "1、exp（曲线）；2、行程量（endpoint）；3、大小舵（D/R）"}, {"id": 34, "sourceNumber": 34, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "3轴、5轴、7轴，哪些是真实存在的飞行器", "answer": "3轴"}, {"id": 35, "sourceNumber": 35, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "固定翼、直升机、多旋翼，在不考虑动力差异和气温对电池影像的情况下，夏天和冬天哪个季节前飞速度快？", "answer": "夏天。1、夏天空气密度低，阻力小2、夏天空气密度小，要想获得相同的升力，\n必须提供更大的速度。"}, {"id": 36, "sourceNumber": 36, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "什么是IMU", "answer": "“惯性测量单元”是测量飞机三轴姿态角(或角速率)以及加速度的装置。一个IMU包含了三个单轴的加速度计和三个单轴的陀螺仪，IMU测量飞机在三维空间中的角速度和加速度，并以此解算出物体的姿态。"}, {"id": 37, "sourceNumber": 37, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "直升机动力失效怎么处置", "answer": "第一步迅速把机头对准逆风的方向，第二部把螺距收到底，成负螺距状态。第三部让直升机匀速下降，保持大桨转速不掉转，甚至可以加速。第四部在接近地面3-5米左右，迅速提起螺距，达到最大正螺距，让直升机缓慢接地。"}, {"id": 38, "sourceNumber": 38, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "尾旋翼传动有什么传动（写三个）", "answer": "轴传动、皮带传动、尾电机直接调速\n40.哪一个平飞速度快\n答：17*6（三叶桨）"}, {"id": 39, "sourceNumber": 39, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "除了GPS导航外，还能用什么方式导航", "answer": "无线电、行星、磁场、激光"}, {"id": 40, "sourceNumber": 40, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "如何用遥控器调飞机的灵敏度？", "answer": "大小舵（双曲率）、行程量、EXP（曲线）（油门曲线、螺距曲线、副翼/升降/方向曲线）、摇杆长度"}, {"id": 41, "sourceNumber": 41, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "飞控的三大算法？", "answer": "捷联惯性导航、PID、卡尔曼滤波"}, {"id": 42, "sourceNumber": 42, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "遥控器的基本菜单最低写10个。一定要按照顺序。", "answer": "先确定手；然后，新建模型；选择模型类型；模型命名；发射制式；通道开关；行程量；反向设定；失控保护；曲线（多旋翼和固定翼调油门；直升机调油门和螺距，按照各自学习的机型写）；大小舵；油门熄火（多旋翼不用写）；教练开关。"}, {"id": 43, "sourceNumber": 43, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "三种翼型，哪种升力最大、哪种操纵性最好、哪种滑行最好((固定翼）", "answer": "平凸、双凸、凹凸"}, {"id": 44, "sourceNumber": 44, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "同样的速度下，是夏天操纵性好，还是冬天操纵性好？（固定翼）", "answer": "冬天"}, {"id": 45, "sourceNumber": 45, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "遥控器、数传、图传的频率：各写三个。", "answer": "1、率数传频率433MHz（亚太）、868MHz（欧美）、915MHz（国内）；2、遥控器频率2.4G、40MHz、72MHz（玩具遥控器）；\n3、图传频率2.4G、5.8G、430M-440M（开放、业余、玩具用等）"}, {"id": 46, "sourceNumber": 46, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "超声波、气压高度计、sgps各测量什么数据传给飞控？", "answer": "A.距离、气压、高度"}, {"id": 47, "sourceNumber": 47, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "直升机桨类型：平凸、双凸、凹凸，升力最大？操纵性最好？大载荷？", "answer": "平凸、双凸、平凸"}, {"id": 48, "sourceNumber": 48, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "多旋翼桨类型：平凸、双凸、凹凸，升力最大？操纵性最好？大载荷？", "answer": "A.平凸、双凸、平凸或凹凸"}, {"id": 49, "sourceNumber": 49, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "19*11/18*12/16*7三叶桨，哪个平飞最快、哪个最灵活、哪个最省电？", "answer": "16*7、16*7、19*11"}, {"id": 50, "sourceNumber": 50, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "固定翼汽油机的配比：20:1/30:1/40:1，冬天用哪一个？", "answer": "40:1"}, {"id": 51, "sourceNumber": 51, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "在所有东西（电机、电池、载重）都不变的情况下，把两叶桨换成三叶桨，哪种桨的平飞速度快，为什么？（直升机）", "answer": "双叶桨快，阻力小"}, {"id": 52, "sourceNumber": 52, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "十字盘和mccpm比较：性能、安全性、效率有什么区别（直升机）", "answer": "十字盘是每一个舵机控制一个舵面，CCPM是每3个舵机同时协调控制一个舵面，所以从性能上来讲，CCPM控制更迅速，精准。安全性来讲十字盘的要优于CCPM，因为只要有一个舵机出问题，或者三个舵机不同步，均会影响任一个舵面，而十字盘只会影响其中一个舵面，相对安全些。从效率上讲，MCCPM要优于十字盘，因为三个舵机同时发力，每个舵机只承受舵面的1/3，因而反应更迅速，控制更均匀。\n56无刷电机内，外转子特点区别，应用领域\n答：外转子扭矩大，适合带较大螺旋桨，效率高，应用在各种电动无人机上\n内转子转速快，适合应用在电动涵道航空模型上。"}, {"id": 53, "sourceNumber": 53, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "什么是卡尔曼滤波？", "answer": "一种利用线性系统状态方程，通过系统输入输出观测数据，对系统状态进行最优估计的算法。由于观测数据中包括系统中的噪声和干扰的影响，所以最优估计也可看作是滤波过程。"}, {"id": 54, "sourceNumber": 54, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "什么是捷联惯导系统？", "answer": "姿态更新算法速度更新算法位置更新算法"}, {"id": 55, "sourceNumber": 55, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "列举两种以上地面站软件设计与使用上的异同？", "answer": "APM地面站、大疆地面站、零度地面站、纵横地面站、UP地面站等，具体略。"}, {"id": 56, "sourceNumber": 56, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "结合起降遥控器说说民用无人机系统都有那几条链路？各条链路作用，常用频率、功率、范围？", "answer": "第一问答案要点:遥控器上行、图传下行、数传上下行。第二问答案要点:遥控器视距内指令上行，2.4G，0.5W，1KM；图传超视距任务图像下行，2.4G、5.8G，1W，2KM全向天线、10KM定向天线；数传超视距指令上行、飞参下行，900M，1W，2KM全向天线、10KM定向天线。"}, {"id": 57, "sourceNumber": 57, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "简述民用无人机地面控制站所有天线的类型、方向图、增益大小、架设或布置方式、连接何设备？", "answer": "要点：A各长度鞭状天线，全向，苹果型方向图，2-6DBI，与通讯方向垂直，遥控器、机载数传。B各尺寸蘑菇头、三叶草、四叶草天线，全向，柿子饼型方向图、5-10DBI，与通讯方向垂直，机载图传、地面图传。C八木、平板、螺旋天线，定向，30度圆锥体型方向图，8-18DBI，与通讯方向同向，远距离地面图传数传。D抛物面天线（锅），定向小范围，手电筒光型方向图，20DBI以上，与通讯方向同向，超远距离图传数传。"}, {"id": 58, "sourceNumber": 58, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "futaba14通道起降遥控器与精灵起降遥控器有什么区别？各有什么注意事项？", "answer": "第一问答案要点:FUTABA可独立编程设置；精灵油门杆是回位的，双天线，只能人工修正、其上可卡视屏屏幕。第二问答案要点:现场解释，略。"}, {"id": 59, "sourceNumber": 59, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "某地GPS高度与气压高度相差100米，可能是什么原因造成的？", "answer": "气压变化；GPS故障；气压高度表故障。"}, {"id": 60, "sourceNumber": 60, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "如果速率陀螺仪安装在无人机振动模态的\u201c波节（节点）\u201d位置，那里振动幅值最小，会有哪些好处？", "answer": "机械振动传递到陀螺仪的能量最小\n陀螺仪受到的高频干扰减弱\n角速度测量噪声会降低\nIMU数据更稳定\n更不容易出现饱和、超量程或滤波压力增大的问题"}, {"id": 61, "sourceNumber": 61, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "旋翼桨叶受到那些力的作用，如何估算这些力的大小？", "answer": "桨叶受到升力，桨叶自身重力和离心力的作用。升力即总重量除以桨叶片数；离心力=桨叶质量×转速平方×重心到旋转轴距离。"}, {"id": 62, "sourceNumber": 62, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "什么是飞机的稳定性", "answer": "飞机的稳定性（也叫飞机的安定性）指的是飞机在飞行过程中，受到一个小的、瞬时的扰动，当这个扰动消失之后，不用操纵飞机，飞机能够自动恢复到原来飞行状态的特性。飞机的稳定性包括飞机的俯仰稳定性、飞机的方向稳定性和飞机的横向稳定性。"}, {"id": 63, "sourceNumber": 63, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "使用16000mAh、6S动力电池的4旋翼稳定悬停时单个支臂电流为10A，问理论航时为多少min?最大电压为多少？放完电后，以5A充电，理论多少h充满？", "answer": "24min；25.2V；3.2h。"}, {"id": 64, "sourceNumber": 64, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "分别简述2个发动机和2个电动机型号，功率，配多大桨，巡航转速多少？", "answer": "答案示例:小松260、2.5HP、14×10、5500RPM。DA50EMAX2210、300W、8×6、6000RPM双天2810"}, {"id": 65, "sourceNumber": 65, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "相同螺旋桨转速与螺距情况下，飞机静止时拉力大？还是有飞行速度时拉力大？为什么？", "answer": "静止时拉力大，有飞行速度时，前方来流使螺旋桨有效攻角变小，升力系数变小。但同时阻力也变小，发动机油门更小。"}, {"id": 66, "sourceNumber": 66, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "描述一下多轴无人机飞行平台与固定翼无人机飞行平台，机载飞控与其他设备有什么不同？", "answer": "多轴有磁罗盘，固定翼有空速管和空速传感器（部分固定翼飞控也有磁罗盘）；固定翼平台本身有一定的安定性，姿态解算较简单，但是固定翼姿态的风干扰较大，协调转弯控制比较复杂，航线也有侧风飞行问题；油动固定翼震动较大，部分设备需要减震（但位置或减震安排合理的话震动比多旋翼还小）；多轴多挂载3轴稳定摄像云台，固定翼多挂载对地正射测绘云台。"}, {"id": 67, "sourceNumber": 67, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "相同起飞重量的飞机，飞机的翼载荷越大表明飞机平飞时必须飞的越快，是否正确?为什么？", "answer": "基本正确。排除升力系数的差别，相同重量的飞机翼载荷大，表明其机翼面积相对较小，必须以更大的速度获取相同的升力。"}, {"id": 68, "sourceNumber": 68, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "模拟讲解多旋翼遥控状态下动力失效具体处理方法？", "answer": "答案要点:有伞开伞；无伞利用仅有动力尽量让其跌落在无人位置；接地瞬间前将油门收至最小，以防着火。"}, {"id": 69, "sourceNumber": 69, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "具体讲述多旋翼飞行过程中遇到强侧风，打满副翼也无法克服应如何处理？", "answer": "如果你的多旋翼前向风阻较小，保持飞行速度，控制航向，将机头指向风来方向，再操纵俯仰，进入前飞状态，克服强风，尽快着陆；如果你的多旋翼各向风阻相同，只能尽快改变高度，尽快着陆。"}, {"id": 70, "sourceNumber": 70, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "简述民用无人机自驾仪首次在飞机上安装调试时，地面控制站飞控软件都需要做什么？", "answer": "要点:飞行器类型选择；配合进行飞控安装位置正反向、安装位置调平、飞行器姿态正反设置；进行各个舵面、其他任务通道正反向设置；数传电台COM口及波特率配置；固定翼空速校准及吹气检查空速管效果，直升机、多轴首次校磁。"}, {"id": 71, "sourceNumber": 71, "section": "动力系统：供电线路故障或电源没有插好、电调或电机故障", "question": "具体讲述无人机视距外，油料或动力电池不足以飞回本场的处理方式？", "answer": "答案要点:果断设置野外备降场。有伞的固定翼可考虑伞降回收，直升机和多轴可直接在备降场降落。（所以视距外作业时，需要在预规划时考虑备降场）"}, {"id": 72, "sourceNumber": 72, "section": "控制站部分（同时含遥控器及链路）", "question": "简述民用无人机作业前，地面控制站都需要做什么？", "answer": "（示例，各类无人机不完全相同）A首先地面检查：飞行器类型或型号选择是否正确；人工调整飞行器姿态，观察地面站反馈是否正确；各机载及地面设备电压；任务设备通道反应或接收效果；固定翼空速校准及吹气检查空速管效果，直升机、多轴校磁。B其次预规划：根据任务内容、地理、气象确定飞行范围；设定一般航线航路点；设定制式航线或扫描航线航路点；设定回家点、伞降点、迫降点等及方案；检查航程、航时、转弯半径、爬升下降能力、地形遮蔽等；等待起飞或发射。"}, {"id": 73, "sourceNumber": 73, "section": "控制站部分（同时含遥控器及链路）", "question": "简述民用无人机地面控制站所有设备及天线、电源如何连接？", "answer": "地面数传接收机分别连接供电电池、数传天线、笔记本COM口；地面图传接收机分别连接供电电池、图传天线、笔记本或其他显示屏；起降遥控器一般是独立成品。"}, {"id": 74, "sourceNumber": 74, "section": "控制站部分（同时含遥控器及链路）", "question": "遥控器基本菜单熟知无人机调试，遥控器必用菜单", "answer": "先确定手。然后，新建模型；;选择模型类型；模型命名，发射制式;通道开关;反向设定;行程量;失控保护;油门曲线;螺距曲线;大小舵;油门熄火；教练开关;"}, {"id": 75, "sourceNumber": 75, "section": "控制站部分（同时含遥控器及链路）", "question": "简述了解的起降遥控器品牌，举例说明一款的性能，价格？", "answer": "第一问答案要点:FUTABA、JR、天地飞等；第二问答案要点:根据实际回答确定。"}, {"id": 76, "sourceNumber": 76, "section": "控制站部分（同时含遥控器及链路）", "question": "油动直升机超视距飞行时需要关注哪些参数？（直升机）", "answer": "发动机的转速，温度，地面站及动力系统的电压，GPS信号；直升机飞行的速度，高度等。"}, {"id": 77, "sourceNumber": 77, "section": "控制站部分（同时含遥控器及链路）", "question": "说说民用无人机系统都有哪几条链路？", "answer": "遥控器上行、图传下行、数传上下行。"}, {"id": 78, "sourceNumber": 78, "section": "控制站部分（同时含遥控器及链路）", "question": "飞行中地面站显示滚转角度为零，目视飞机有明显的坡度，可能原因是什么？", "answer": "飞控故障；下行链路中断"}, {"id": 79, "sourceNumber": 79, "section": "控制站部分（同时含遥控器及链路）", "question": "起降遥控器日本手和美国手区别是什么？各动作控制各类飞行器绕什么运动轴运动？", "answer": "第一问答案要点:日本手右手油门，美国手反之。第二问答案要点:操作演示固定翼、多旋翼横纵立三个轴。"}, {"id": 80, "sourceNumber": 80, "section": "控制站部分（同时含遥控器及链路）", "question": "起降遥控器如何设置某一通道（如副翼）的正反舵？如何将某一通道（如控制模式切换）定义在面板某指定开关上？", "answer": "第一问答案要点:操作演示REV。第二问答案要点:操作演示SW1。"}, {"id": 81, "sourceNumber": 81, "section": "控制站部分（同时含遥控器及链路）", "question": "多旋翼飞行器为什么一般相对的桨旋转方向是不一样的？", "answer": "两两相对，抵消反扭。\n12.旋翼翼尖线速度计算方法\n答：角速度×半径。"}, {"id": 82, "sourceNumber": 82, "section": "控制站部分（同时含遥控器及链路）", "question": "简述升力公式和各项意义？", "answer": "L=1/2CYρV2S。L升力；1/2常数；CY升力系数主要反映迎角和弯度；ρ空气密度V固定翼、旋翼或螺旋桨各点线速度S固定翼、旋翼或螺旋桨各位置单位面积。"}, {"id": 83, "sourceNumber": 83, "section": "控制站部分（同时含遥控器及链路）", "question": "无人机有几个运动轴、是什么，沿轴和绕轴都是什么运动，舵面如何实现该运动？", "answer": "答案要点:沿横轴左右平移，绕横轴俯仰。沿纵轴前进后退，绕纵轴横滚。沿立轴上升下降，绕立轴改变航向。"}, {"id": 84, "sourceNumber": 84, "section": "控制站部分（同时含遥控器及链路）", "question": "手拿遥控器（日本或美国手），简述固定翼和多轴拨动每个杆转速或舵面怎么变化，飞行器怎么变化？", "answer": "略 易出错的是，固定翼拉杆，升降舵上偏，无人机上仰。多轴拉杆，前桨加速，无人机后退。"}, {"id": 85, "sourceNumber": 85, "section": "控制站部分（同时含遥控器及链路）", "question": "结合升力公式，说明螺旋桨为什么设计成几何扭转？", "answer": "保证各半径位置均匀产生升力，提高整体效率。"}, {"id": 86, "sourceNumber": 86, "section": "控制站部分（同时含遥控器及链路）", "question": "简述4轴飞行器如何完成悬停中实现左转90度？", "answer": "顶视顺时针桨加速，逆时针桨减速。"}, {"id": 87, "sourceNumber": 87, "section": "控制站部分（同时含遥控器及链路）", "question": "简述无人直升机周期变距的原理及机构原理？", "answer": "周期性改变迎角；自动倾斜器。具体略"}, {"id": 88, "sourceNumber": 88, "section": "控制站部分（同时含遥控器及链路）", "question": "简述多轴、尾桨单旋翼直升机、共轴直升机分别如何实现原地悬停左转？", "answer": "多轴；顺桨加速。共轴直升机；顺桨加螺距。尾桨单旋翼直升；尾桨减螺距"}, {"id": 89, "sourceNumber": 89, "section": "控制站部分（同时含遥控器及链路）", "question": "无人机以某空速在甲乙两地往复飞行一次所用的时间，与当有固定风速从甲地吹向乙地时作同样的一次往复飞行所用时间是否相等？原因是什么？", "answer": "不相等，有风时时间会长，因为顺风时减少的时间小于逆风时增加的时间。"}, {"id": 90, "sourceNumber": 90, "section": "控制站部分（同时含遥控器及链路）", "question": "保持指示空速飞行，随着高度的增加，真空速会越来越大还是越来越小？为什么？（固定翼）", "answer": "越来越大。指示空速表征飞机的动压，高度增加，空气密度减小，保持相同的动压，必须以相对气流更高的速度飞行。"}, {"id": 91, "sourceNumber": 91, "section": "控制站部分（同时含遥控器及链路）", "question": "常规布局直升机的尾桨只是用来改变飞行航向的。不改变航向，不需改变尾桨转速，是否正确？（直升机）", "answer": "不正确.尾桨主要用来平衡主旋翼的反扭力矩，若油门变化，必须相应调整尾桨转速平衡扭矩"}, {"id": 92, "sourceNumber": 92, "section": "控制站部分（同时含遥控器及链路）", "question": "描述翼型失速，一般多少度", "answer": "迎角增加超过一定数值时，气流在上翼面的中后部严重分离，升力会突然降低，阻力迅速增加，这种现象被称为“失速”。一般13度上下"}, {"id": 93, "sourceNumber": 93, "section": "控制站部分（同时含遥控器及链路）", "question": "简述低速飞机阻力产生的原因及组成", "answer": "飞机在空中飞行时，除了产生升力外，还会产生阻力。阻力是阻碍飞机前进的空气动力，它的方向与飞机运动方向相反（或与气流流动方向一致）。在低速飞行时，飞机的阻力有摩擦阻力、压差阻力、诱导阻力和干扰阻力四种。\n25.影响阻力大小的因素\n答：迎角、飞行速度、大气密度、机翼面积、翼型、表面光洁度"}, {"id": 94, "sourceNumber": 94, "section": "控制站部分（同时含遥控器及链路）", "question": "多旋翼有几个自由度？要在这几个自由度上改变旋翼怎么变化？", "answer": "6个自由度，上下，左右，前后，俯仰，横滚，航向。上下：旋翼都加速实现向上，减速向下。左右同横滚：多旋翼左侧加速，右侧减速实现向右移动/横滚，反之，右侧加速，左侧减速，实现向左移动/横滚。前后同俯仰：多旋翼后面加速，前面减速，实现向前移动/俯，反之，前面加速，后面减速，实现向后移动/仰。航向：多旋翼向左（俯视多旋翼，顺时针旋转，旋翼加速，逆时针方向旋翼减速），向右转向，则反之"}, {"id": 95, "sourceNumber": 95, "section": "控制站部分（同时含遥控器及链路）", "question": "自动驾驶仪中的陀螺是用来测量哪些物理量的？", "answer": "角速度或姿态角。"}, {"id": 96, "sourceNumber": 96, "section": "控制站部分（同时含遥控器及链路）", "question": "GPS导航、无线电导航、磁航向仪、惯性导航仪哪些是持续依赖外界条件的导航设备？", "answer": "前3者。"}, {"id": 97, "sourceNumber": 97, "section": "控制站部分（同时含遥控器及链路）", "question": "简述舵面遥控（纯手动）、姿态遥控、人工修正（即GPS模式）区别？", "answer": "舵面遥控飞控什么都不管；姿态遥控飞控管姿态，人管位置；人工修正飞控姿态位置都管，人给位置修正量"}, {"id": 98, "sourceNumber": 98, "section": "第三部分：动力系统", "question": "螺旋桨的螺距是什么？", "answer": "螺旋桨桨叶旋转一周形成的螺旋面的长度，或者叫前进速度。"}, {"id": 99, "sourceNumber": 99, "section": "第三部分：动力系统", "question": "螺旋桨的主要技术参数有哪些？", "answer": "直径；螺距；桨叶数量。"}, {"id": 100, "sourceNumber": 100, "section": "第三部分：动力系统", "question": "动力电机的主要技术参数有哪些？", "answer": "规格尺寸；重量；最大功率；工作转速范围；空载KV值等。"}, {"id": 101, "sourceNumber": 101, "section": "第三部分：动力系统", "question": "电子调速器的主要技术参数有哪些？", "answer": "最大电流；输入电压范围；对外供电能力等。"}, {"id": 102, "sourceNumber": 102, "section": "第三部分：动力系统", "question": "动力电池的主要技术参数有哪些？", "answer": "总电压；总容量；最大放电倍率；重量等。"}, {"id": 103, "sourceNumber": 103, "section": "第三部分：动力系统", "question": "以1045桨为例，桨叶规格的含义是什么？", "answer": "1045代表桨叶直径是10英寸，螺距为4.5英寸，1英寸为25.4mm。"}, {"id": 104, "sourceNumber": 104, "section": "第三部分：动力系统", "question": "聚合物锂电单片电压是多少？3S2P代表什么含义？", "answer": "电压为3.7v，3S2P代表3片串联，然后两个这样的串联结构并联，电压为11.1v"}, {"id": 105, "sourceNumber": 105, "section": "第三部分：动力系统", "question": "请以5000mAh，20C锂电池为例，解释放电倍率的含义，该电池最大放电电流为多少？", "answer": "放电倍率（C）=放电电流（A）/额定容量（Ah），该电池的最大放电电流为20C×5Ah=100A"}, {"id": 106, "sourceNumber": 106, "section": "第三部分：动力系统", "question": "四冲程与两冲程的原理、特点（固定翼）", "answer": "点火一次活塞下一次上一次是二冲程，点火一次活塞下一次上一次下一次上一次是四冲程；四冲程每个汽缸前都有2个节气门杆；四冲程效率高，转速低、较重、贵；二冲程汽油机油以1：25-1：40比例混合后使用，四冲程润滑油多单加注。"}, {"id": 107, "sourceNumber": 107, "section": "第三部分：动力系统", "question": "简述无人机系统用电池类型，单体电压、充放电特性、用途等？", "answer": "锂聚合物，3.7V，无记忆效应、过放涨肚、大电流放电，适用于动力。电源铅酸蓄电池，6V、12V，无记忆效应、大电流放电，廉价适用于启动电源。镍氢电池，1.2V，小记忆效应、小电流放电，适用于设备电源。镍镉电池，1.2V，强记忆效应、大电流放电，早期动力电源。干电池，1.5V，不可充电、小电流放电，临时设备电源"}, {"id": 108, "sourceNumber": 108, "section": "第三部分：动力系统", "question": "普通无刷电调几根线，分别连什么？", "answer": "八根线2粗，红黑连电池；3中，同色连电机；3细，杜邦连飞控或接收机。注：杜邦中红线可反向供电"}, {"id": 109, "sourceNumber": 109, "section": "第三部分：动力系统", "question": "无人机系统电机分类？最常用类型及特点？", "answer": "第一问答案要点:有刷、无刷、内转子、外转子、交流、直流、三相、两相、同步、异步。第二问答案要点:外转子三相交流同步无刷电机，效率达80%以上。"}, {"id": 110, "sourceNumber": 110, "section": "第三部分：动力系统", "question": "外转子电机规格22089T", "answer": "22定子线圈直径08定子线圈高度9T：9匝线圈。"}, {"id": 111, "sourceNumber": 111, "section": "第三部分：动力系统", "question": "螺旋桨1107、正桨、CW、CCW意义", "answer": "1107即1107：桨径11英寸螺距7英寸，1英寸等于2.54厘米。正桨：右旋前进。反桨有时会标一个R。如1107RCCW：前视或俯视逆时针旋转，即正桨。CW反桨。"}, {"id": 112, "sourceNumber": 112, "section": "第三部分：动力系统", "question": "简述如何为你的锂聚合物动力电池充电？", "answer": "连动力插头；连平衡充插头；设置电池类型、节数、充电电流、截止电压；不脱离视线等等"}, {"id": 113, "sourceNumber": 113, "section": "第三部分：动力系统", "question": "电动动力的飞机，随着高度的增加，电动机功率是否会降低？为什么？", "answer": "不会，电动机功率是由额定电压和电流确定的，与高度变化无关。"}, {"id": 114, "sourceNumber": 114, "section": "第三部分：动力系统", "question": "动力电池的功率密度越大越好还是越小越好？为什么？", "answer": "一般越大越好，相同重量的电池可以产生更大的功率；但也不能过大，大了贵。"}, {"id": 115, "sourceNumber": 115, "section": "第三部分：动力系统", "question": "电池的能量密度越大越好还是越小越好？为什么？", "answer": "越大越好，相同重量的电池可以飞更长时间。"}, {"id": 116, "sourceNumber": 116, "section": "第三部分：动力系统", "question": "多旋翼动力系统的总效率包含哪些因素？", "answer": "电池的效率、电调的效率、电机的效率、螺旋桨的效率。"}, {"id": 117, "sourceNumber": 117, "section": "第三部分：动力系统", "question": "多旋翼电调与电机如何匹配。", "answer": "电调的极限电流值留有足够裕度即可。具体可根据电机巡航功率推算出单个支臂巡航电流，根据电流的3到5倍以上选取电调。"}, {"id": 118, "sourceNumber": 118, "section": "第三部分：动力系统", "question": "你使用的训练用多轴，螺旋桨转向，各种运动转速变化？", "answer": "前加后减，向后飞。左加右减，向右飞。加油门向上飞。顺时针加速逆减向左转。"}, {"id": 119, "sourceNumber": 119, "section": "第三部分：动力系统", "question": "对于自己DIY的多旋翼无人机，一个螺旋桨损坏了，为什么要换一对新的", "answer": "因为对角线的螺旋桨需要互相平衡反扭矩，需要较精密的平衡。商品级的多旋翼桨的一致性较好，但自己DIY多旋翼时，再购买一对正反桨较为可靠"}, {"id": 120, "sourceNumber": 120, "section": "第三部分：动力系统", "question": "内、外转子无刷电机特点区别，应用领域", "answer": "外转子扭矩大、适合带较大螺旋桨，效率高，广泛应用在各种电动无人机上；内转子转速快，适合应用在电动涵道航空模型上。"}, {"id": 121, "sourceNumber": 121, "section": "第三部分：动力系统", "question": "电动无人机的电调如何校准？", "answer": "使用遥控器校准或编成卡校准，具体操作根据不同品牌电调略。"}, {"id": 122, "sourceNumber": 122, "section": "第三部分：动力系统", "question": "在聚合物锂电满电的情况下，6S10000mah，搭配100KV的电机与3S20000mah搭配300KV的电机哪个转速快", "answer": "第二个快；6S：6×4.2×100=2520；3S：3×4.2×300=3780。"}, {"id": 123, "sourceNumber": 123, "section": "第三部分：动力系统", "question": "常用电动动力系统，电机、电调、电池各有几根线？", "answer": "无刷电机3根，电调8根，电池S数+3根"}, {"id": 124, "sourceNumber": 124, "section": "第三部分：动力系统", "question": "简要按一定顺序介绍多旋翼无人机的配电、用电系统", "answer": "动力电源——分电设备（并联）——ESC——电机动力电源——ESC电调或（降压模块（BEC）——飞控、接收机及其他低压设备或低电压电源"}, {"id": 125, "sourceNumber": 125, "section": "第三部分：动力系统", "question": "一般冬天和夏天相比，我们的返航电压该怎么设置，为什么？", "answer": "冬天的返航电压一般高于夏天，因为冬天气温低，锂电池的活性及放电能力也会降低，假如返航电压过低的话，有可能导致突然降压引发飞行事故。"}, {"id": 126, "sourceNumber": 126, "section": "第三部分：动力系统", "question": "现有一块聚合物锂电池可能会长时间不使用，充放电至电量多少，电压多少储存合适？", "answer": "放电至剩余电量40%-50%，电压3.8V。"}, {"id": 127, "sourceNumber": 127, "section": "第三部分：动力系统", "question": "无刷电机如果遇到旋转方向相反，需要换向时应如何处理？", "answer": "电调与电机的连线3根中任意对换2根。"}, {"id": 128, "sourceNumber": 128, "section": "第三部分：动力系统", "question": "无刷电机是直流电机还是交流电机？", "answer": "如果单看电机是交流，如果把电调与电机看作一体则为直流。"}, {"id": 129, "sourceNumber": 129, "section": "第四部分：飞行器平台", "question": "掰动面前固定翼无人机的每个舵面，说出这叫什么，说出此时飞机将怎么运动，起降遥控器此刻怎么打？（固定翼）", "answer": "略"}, {"id": 130, "sourceNumber": 130, "section": "第四部分：飞行器平台", "question": "典型的无人直升机由哪几部分组成（直升机）", "answer": "机体结构，起落架，旋翼系统，传动系统，发动机，尾桨系统"}, {"id": 131, "sourceNumber": 131, "section": "第四部分：飞行器平台", "question": "请简述共轴式直升机的工作原理（直升机）", "answer": "共轴式直升机两副旋翼共轴反转，两副旋翼产生的扭矩在航向不变的飞行状态下相互平衡，并通过上下旋翼总距差动产生不平衡扭矩实现航向操纵"}, {"id": 132, "sourceNumber": 132, "section": "第四部分：飞行器平台", "question": "地面效应对直升机有什么影响，多高以内有地效？", "answer": "当直升机在低于旋翼直径的高度悬停时，将产生地面效应，地面效应会降低旋翼下洗流速度，从而降低桨叶的诱导角，产生相同的升力，阻力也相应降低，对发动机的功率需求也减小。"}, {"id": 133, "sourceNumber": 133, "section": "第四部分：飞行器平台", "question": "多轴飞行器飞行平台由哪些设备组成，描述出其连接方式？", "answer": "遥控接收机——飞控——电调——电机；动力电池——电调——电机；数传电源——数传模块——飞控；摄像头——图传——图传电源。"}, {"id": 134, "sourceNumber": 134, "section": "第四部分：飞行器平台", "question": "对应面前的多旋翼飞行平台，指出每一个位置是什么设备？", "answer": "云台、接收机、GPS天线、飞控、电调、电机、机载数传模块等"}, {"id": 135, "sourceNumber": 135, "section": "第四部分：飞行器平台", "question": "多旋翼飞行器上各种天线设备布置有什么要求？", "answer": "GPS接收天线尽量中心高处无遮挡；遥控接收机天线、数传天线、图传天线尽量互相远离都布置于机身下方无遮挡；所有全向天线尽量垂直布置。"}, {"id": 136, "sourceNumber": 136, "section": "第四部分：飞行器平台", "question": "固定翼无人机上各种天线设备布置有什么要求？（固定翼）", "answer": "GPS接收天线尽量中心高处无遮挡，如机体后背处；遥控接收机天线、数传天线、图传天线尽量互相远离都布置于机身下方无遮挡处，如图传天线接近云台布置于机体下颚处，数传天线布置在机尾下方，遥控接收机天线布置于机体正下方；所有全向天线尽量垂直布置；油动发动机的无人机，天线与发动机要保持一定距离。"}, {"id": 137, "sourceNumber": 137, "section": "第四部分：飞行器平台", "question": "机载视距链路天线放在机腹比放在机背好，是这样吗？", "answer": "不一定，要视无人机作业的高度与距离，机体外形，起落架位置，电磁兼容等综合考虑。"}, {"id": 138, "sourceNumber": 138, "section": "第四部分：飞行器平台", "question": "电动多旋翼的螺旋桨可以做的尽量大，从而可以用最少的旋翼数实现大载荷，是否正确？为什么？", "answer": "不完全正确，一定起飞重量以下的多旋翼是成立的，但大尺寸多旋翼如果桨叶过大，转动惯量将过大，电机调速响应慢，飞行稳定性就会降低。这时就得像直升机一样使用变距控制才能有足够的控制响应速度。"}, {"id": 139, "sourceNumber": 139, "section": "第四部分：飞行器平台", "question": "多旋翼是不是任意方向都可以作为机头指向飞行方向，为什么？", "answer": "不是，磁罗盘和飞控，惯性测量单元即IMU的安装都有指向性要求。即使能够用无头模式飞行的多旋翼其实也是有头的。"}, {"id": 140, "sourceNumber": 140, "section": "第四部分：飞行器平台", "question": "为什么部分多旋翼GPS天线必须高出机体，并远离金属，尤其是铁？", "answer": "因为这类GPS天线集成了外置磁传感器，容易受到磁场的干扰。"}, {"id": 141, "sourceNumber": 141, "section": "第四部分：飞行器平台", "question": "活塞发动机后推式固定翼和前拉式固定翼是用正桨还是反桨", "answer": "前拉装正桨，后推装反桨。"}, {"id": 142, "sourceNumber": 142, "section": "第四部分：飞行器平台", "question": "直升机的重心位置处于机体的哪个部位", "answer": "直升机的主轴处。"}, {"id": 143, "sourceNumber": 143, "section": "第四部分：飞行器平台", "question": "多旋翼拥有三轴布局的形式，这种布局形式中间轴多了一个舵机，为什么要加这个舵机？", "answer": "单独固定的三轴无法完成多旋翼正常的稳定与操纵，因此需要加一个舵机略微改变中间轴的拉力矢量方向，从而达到抵消那个不成对螺旋桨的反扭力矩。"}, {"id": 144, "sourceNumber": 144, "section": "第四部分：飞行器平台", "question": "多旋翼1米1轴距代表什么意思", "answer": "对角电机轴间距离，业内轴距用来简单形容多旋翼的大小。"}, {"id": 145, "sourceNumber": 145, "section": "第五部分：正常操作程序与应急处", "question": "无人直升机遥控状态下动力失效处理方法？", "answer": "势能换动能，先打负总距，使旋翼自转，且转速保持在略大于巡航转速；高速下降，在离地面数米高度时，将总距变到最大，迅速制止快速下沉，自旋降落。"}, {"id": 146, "sourceNumber": 146, "section": "第五部分：正常操作程序与应急处", "question": "多旋翼遥控状态下动力失效处理方法？", "answer": "开伞"}, {"id": 147, "sourceNumber": 147, "section": "第五部分：正常操作程序与应急处", "question": "开伞回收的固定翼无人机如未能成功开伞？（固定翼）", "answer": "A如果伞舱打开，伞未完全弹出，遥控机腹迫降。B如果伞弹出但未完全充气，有条件的机载切断，机腹迫降。C不能切断的，先使用最大马力看飞行操纵是否还有效，拖伞着陆。D还不行，在坠地瞬间之前将动力关至最小，减小损失，防止失火。"}, {"id": 148, "sourceNumber": 148, "section": "第五部分：正常操作程序与应急处", "question": "无人机视距外飞行，风速大于飞机与飞控极限？", "answer": "大气中风速高度不同变化很大，迅速改变高度。"}, {"id": 149, "sourceNumber": 149, "section": "第五部分：正常操作程序与应急处", "question": "无人机视距外飞行，GPS丢星？", "answer": "如果图传是好的，有机载视频能提供引导，可以仿照FPV模式，将无人机飞回。如果飞控姿态还持续有效，数据链路也仍然有效，可用姿态遥控模式将其飞回。如果不能飞回，果断在野外开伞回收。如无伞可考虑收小油门迫降，以防飞丢。"}, {"id": 150, "sourceNumber": 150, "section": "第五部分：正常操作程序与应急处", "question": "如果数传链路下行中断，会发生什么后果？如何处置？", "answer": "地面站软件上的飞行状态和数据不再更新。无人机在视距内应尽快遥控着陆；视距外，先发送返航指令，安心等待返航；个别情况下，可倚靠任务设备图像返航。"}, {"id": 151, "sourceNumber": 151, "section": "第五部分：正常操作程序与应急处", "question": "如果数传链路上行中断，会发生什么后果？如何处置？", "answer": "无法在线重规划航线航点及发送任务指令等。无人机在视距内应尽快遥控着陆；视距外，可尝试重新启动地面站或检查上行链路设备恢复通信，否则只能安心等待飞完所有航点后返航或链路中断触发返航；。"}, {"id": 152, "sourceNumber": 152, "section": "第五部分：正常操作程序与应急处", "question": "固定翼无人机在降落时风向变化为顺航向，应如何处置？（固定翼）", "answer": "视风力大小是否超过顺风着陆限制，如果超过限制，应复飞或改变着陆方向。"}, {"id": 153, "sourceNumber": 153, "section": "第五部分：正常操作程序与应急处", "question": "固定翼下滑拉平时，若侧风超过限制，应如何处置？（固定翼）", "answer": "首先应复飞待机，视风速减小到可降落时适时着陆。"}, {"id": 154, "sourceNumber": 154, "section": "第五部分：正常操作程序与应急处", "question": "燃油动力无人机空中停车，应如何处置？", "answer": "如果可空中起动的，应首先尝试起动发动机。若不能起动，在返场则选择迫降；不能返回本场，则在预设迫降场迫降；如无预设迫降场，则尽量选择无人区迫降。"}, {"id": 155, "sourceNumber": 155, "section": "第五部分：正常操作程序与应急处", "question": "使用遥控器遥控飞行时，如果无人机反应时断时续或无反应，应如何操作？", "answer": "多数此类情况出现在无人机目视较远距离飞行、遥控器电力不足、有外界干扰的情况下，现阶段多数自动驾驶仪都有失控保护功能会切入自动驾驶，此时为了防止自驾仪在手动自动之间切来切去反而造成危险，需要果断切换遥控器开关进入自动模式并关闭遥控器。之后再等待无人机自动飞回较近距离或检查遥控器电源或等待干扰消失。"}, {"id": 156, "sourceNumber": 156, "section": "第五部分：正常操作程序与应急处", "question": "逆风、顺风或侧风对多旋翼飞行的影响？", "answer": "多数多旋翼是按照机头方向飞行阻力最小设计的，所以逆风悬停最省电，同理机头向前航线飞行最省电。从飞控角度来说，风向不同只是影响了悬停与航线飞行的姿态角，总的来说风越大越耗电。另外对于手动或姿态模式及部分飞控的GPS模式，顺风飞行能够获得较大的地速。\n16.侧风飞行操作要点\n答：三类飞行器自驾模式基本都不用理会直升机、多旋翼姿态和手动模式向侧风方向稍打副翼。固定翼姿态和手动模式可用侧滑法（副翼）或航向法（方向舵）修正；需要保证对地姿态水平的固定翼建议用航向法；另外无论用何种方法，固定翼侧风着陆接地前的一刻需要将航向摆正，机翼水平。"}, {"id": 157, "sourceNumber": 157, "section": "第五部分：正常操作程序与应急处", "question": "定点转弯、协调转弯、自适应协调转弯的区别", "answer": "定点转弯，旋翼在悬停状态下转弯，会精确通过每个GPS位置点，在每个位置点会减速、悬停，停留，停留的时间可以设置。协调转弯，飞行速度、油门基本不变，旋翼会偏离GPS位置点，可能会在航线拐弯的外侧。自适应协调转弯，飞行速度、油门会随航线转弯而减速，旋翼会偏离GPS位置点，但不会出现在航线拐弯的外侧。固定翼只使用协调转弯。"}, {"id": 158, "sourceNumber": 158, "section": "第五部分：正常操作程序与应急处", "question": "八旋翼飞行器空中飞行时副翼方向电机坏一个如何处理", "answer": "现代的多旋翼飞控在六轴和八轴飞行器上都有一定的安全裕度，六轴坏一个，八轴坏不相邻两个基本都能保证安全降落。遇到这种情况不用紧张，需要尽快降落，注意不要有太大的操作动作即可。为了安全考虑，一定要在远离人群的地方迫降。"}, {"id": 159, "sourceNumber": 159, "section": "第五部分：正常操作程序与应急处", "question": "飞行器检查时，多旋翼电机产生震动，在排除电机本身故障后，检查动力电路。我们应检查电调的输入端连接还是输出端连接。", "answer": "输出端接触不良会导致缺相至使电机产生震动。或杜邦线插头松动。"}, {"id": 160, "sourceNumber": 160, "section": "第五部分：正常操作程序与应急处", "question": "多轴飞行一段时间后，应对电机安装位置如何检查？", "answer": "应该用水平尺校准，保证各电机均应该水平不应出现倾斜等。"}, {"id": 161, "sourceNumber": 161, "section": "第五部分：正常操作程序与应急处", "question": "如何保证数传链路在使用中的稳定性、安全性", "answer": "1、地面调试阶段有条件的话要进行最大数据量下的拉距实验，并熟悉各种天线的性能。2、飞控中需使能链路中断返航功能，并设定好中断难复判断时间。3、在飞行场要调查航线沿途重要干扰源，并作避让措施。4、起飞前检查电台、天线、馈线、电台电池，是否有脱落、断裂，电压不够等状态。"}, {"id": 162, "sourceNumber": 162, "section": "第五部分：正常操作程序与应急处", "question": "在自主飞行过程中，遥控器油门的位置应处于", "answer": "中间略上。防止切换到增稳等其它模式时，上升或下降过快。"}, {"id": 163, "sourceNumber": 163, "section": "第五部分：正常操作程序与应急处", "question": "一架在150米高度顺风飞行的直升机，发动机突然失效，应该怎么操作（直升机）", "answer": "自旋降落。具体参考：切入姿态或手动，调整方向逆风，总距收到最小，加速旋翼旋转，垂直下落，距地面还有一定距离时将总距推至最大，降落。"}, {"id": 164, "sourceNumber": 164, "section": "第五部分：正常操作程序与应急处", "question": "多旋翼飞行器如果重新组装后，必须校准哪些传感器？", "answer": "磁罗盘，陀螺仪GPS"}, {"id": 165, "sourceNumber": 165, "section": "第五部分：正常操作程序与应急处", "question": "多旋翼飞行器在更换任务载荷后，除了平时的常规检查外，还应进行什么检查？", "answer": "更换新的任务载荷后，由于新的载荷重量可能会与老的载荷不同，会导致无人机的重心位置偏移，所以要进行重心位置检查并进行调整。"}, {"id": 166, "sourceNumber": 166, "section": "第五部分：正常操作程序与应急处", "question": "无人机在飞行中晃动过大或反应滞后，除了飞控感度的原因，还有可能是什么原因？", "answer": "1、多旋翼飞行器机臂刚度不够，或有安装旷量。2多旋翼机体太大致使转动惯量太大。3、多旋翼螺旋桨太重，加减速慢致使操纵相应慢。4、固定翼机体或舵面刚度不够，连杆、摇臂或舵机本身有旷量。"}, {"id": 167, "sourceNumber": 167, "section": "第五部分：正常操作程序与应急处", "question": "地面检查自动驾驶模式操纵反馈时，舵面偏转方向与正常情况相反，可能是什么原因？", "answer": "传感器安装方向错误或地面站舵机正反向设置错误。"}, {"id": 168, "sourceNumber": 168, "section": "第五部分：正常操作程序与应急处", "question": "自动定高飞行时，飞行器持续升高或下降，可能的原因是什么？", "answer": "高度传感器故障或动力系统故障。"}, {"id": 169, "sourceNumber": 169, "section": "第五部分：正常操作程序与应急处", "question": "U-cloud优云系统在实际作业中都有哪些具体应用？", "answer": "申报飞行计划、获取禁飞区信息、获取气象资料、统计训练时间、统计作业面积等等。\n32高海拔地区多旋翼是选用三叶桨还是两叶桨，为什么？\n答；两叶桨，因为两叶桨更平稳效率更高选用大直径小螺距的两叶桨，"}, {"id": 170, "sourceNumber": 170, "section": "第五部分：正常操作程序与应急处", "question": "imu是什么？", "answer": "英文：Inertialmeasurementunit，简称IMU）是测量物体三轴姿态角(或角速率)以及加速度的装置。一个IMU包含了三个单轴的加速度计和三个单轴的陀螺仪，加速度计检测物体在载体坐标系统独立三轴的加速度信号，而陀螺检测载体相对于导航坐标系的角速度信号，imu测量物体在三维空间中的角速度和加速度，并以此解算出物体的姿态。在导航中用着很重要的应用价值。为了提高可靠性，还可以为每个轴配备更多的传感器。一般而言IMU要安装在被测物体的重心上"}, {"id": 171, "sourceNumber": 171, "section": "第一部分：控制站部分（同时含遥控器及链路）", "question": "简述GPS技术基本原理？", "answer": "答案要点：各星与地面GPS接受机都有统一的标准时间，各星向外广播发送这个时间及本星的位置（星历），地面GPS接受机根据收到的各星位置与时间差反推计算出自己的位置。"}, {"id": 172, "sourceNumber": 172, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "简述固定翼无人机的几个角度的区别：机翼安装角、迎角、俯仰角、上升下滑角？（固定翼）", "answer": "机翼安装角：机翼弦线与纵轴；迎角：机翼弦线与来流；俯仰角：纵轴与水平面；上升下滑角：航迹与水平面。"}, {"id": 173, "sourceNumber": 173, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "直升机前飞状态的功率分为哪几个部分？它们随前飞速度的增加如何变化？", "answer": "型阻功率，诱导功率，废阻功率。随着直升机飞行速度的增加，型阻功率基本不变，诱导功率不断减小，废阻功率迅速增加；总功率先减小后增加，功率曲线成马鞍形。"}, {"id": 174, "sourceNumber": 174, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "请描述直升机旋翼在前飞状态下的挥舞特性；说明引起挥舞的原因。（直升机）", "answer": "由于旋翼桨叶的相对气流左右不对称引起的挥舞（后倒角）：前行桨叶（0°-90°-180°方位）相对气流速度增大，桨叶升力增加，桨叶上挥，90°方位处桨叶上挥速度最快，180°方位处桨叶不再上挥，桨叶的挥舞位置最高。与之相反，后行桨叶（180°-270°-360°方位）下挥，270°方位出桨叶下挥速度最快，360°方位处桨叶挥舞位置最低。由于旋翼的锥度角造成的前后桨叶迎角不对称引起的挥舞（侧倒角）：前飞时，由于旋翼的锥度角，旋翼的前半部分（90°-180°-270°方位）的相对气流对桨叶产生向上的垂直分量，桨叶的剖面的迎角加大，桨叶升力增大，桨叶上挥，180°方位处上挥速度最大，270°方位桨叶挥舞位置最高。与之相反，旋翼的后半部分（270°-0°-90°方位）的相对气流对桨叶产生向下的垂直分量，桨叶的剖面的迎角减小，桨叶升力减小，桨叶下挥，0°方位处上挥速度最大，90°方位桨叶挥舞位置最高。"}, {"id": 175, "sourceNumber": 175, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "摆振铰的作用是什么？（直升机）", "answer": "减震。角动量守恒。由于旋翼挥舞运动引起了对桨叶根部的周期交变的哥氏力，同时桨叶在旋转平面内的空气动力阻力也造成了根部弯矩。为了解决桨叶根部交变弯矩很大的这一困难，在旋翼上设置了摆振铰，这样桨叶可以绕摆振铰在旋转平面内前后摆动。"}, {"id": 176, "sourceNumber": 176, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "一般直升机的重心相对于旋翼轴在什么位置？为什么？", "answer": "一般直升机的重心相对于旋翼轴稍偏前。因为此种情况下当直升机受一抬头扰动后，增加了迎角，旋翼气动合力相应增加了，从而产生了一个绕重心的低头力矩，可以抵消不稳定的扰动抬头力矩，使直升机恢复到初始位置状态，这样对于稳定性是有利的。"}, {"id": 177, "sourceNumber": 177, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "直升机最大前飞速度受哪些因素限制？", "answer": "由于飞行速度的增加，单位废阻大大增加，单位需用功率不断增加。需用功率限制了最大飞行速度，另外前行桨叶气流分离及局部激波和后行桨叶失速也是限制因素。"}, {"id": 178, "sourceNumber": 178, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "桨尖速度对直升机重量有哪些影响？（直升机）", "answer": "桨尖速度越大，主减速器的减速比减小，需用功率增大，传动系统重量下降，结构重量下降，总重下降。桨尖速度上限受局部激波的限制，下限受主减速器重量和发动机停车时用于自转和瞬时增距的储备能量界线限制。过大或者过小的桨尖速度都会使单位型阻功率增加。"}, {"id": 179, "sourceNumber": 179, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "桨盘载荷上下限受那些限制？（直升机）", "answer": "对于单发直升机，桨盘载荷的上限往往受自转下滑速度限制，对于双发和多发直升机，桨盘载荷的最大值受到悬停时旋翼洗流速度的限制。桨盘载荷的下限由旋翼的最大尺寸限制决定。"}, {"id": 180, "sourceNumber": 180, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "试述桨盘载荷对直升机重量的影响？（直升机）", "answer": "桨盘载荷的大小严重影响直升机有效载荷占总重的比例。桨盘载荷直接影响主减速器及旋翼桨叶的相对重量，盘载荷越大两者就越小。桨盘载荷越大，单位需用功率越大，应该选择更大的发动机，动力装置的相对重量就越大。桨盘载荷对相对燃油重量也有影响，桨盘载荷加大时，其略有增加。"}, {"id": 181, "sourceNumber": 181, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "如果要求直升机有较大的升限，主要参数该如何选择？（直升机）", "answer": "要求直升机有较大的升限，可以采用功率较大的发动机；采用较小的桨盘载荷可以降低诱导功率，从而减少悬停需用功率；提高功率利用系数，如果是活塞式发动机可以采用废气增压，以改善发动机的高度特性，从而提高直升机升限。"}, {"id": 182, "sourceNumber": 182, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "如果要求直升机有较大的爬升率和续航时间，主要参数该如何选择？（直升机）", "answer": "要求直升机有较大的爬升率和续航时间，可通过采用较大的发动机的措施来提高直升机的最大爬升速度；提高燃油重量，可以提高续航时间。"}, {"id": 183, "sourceNumber": 183, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "如果要求直升机有较大飞行速度和航程，可采用哪些措施？（直升机）", "answer": "要求直升机有较大飞行速度和航程，主要是降低全机废阻功率和型阻功率，减小桨盘载荷和提高功率利用系数。"}, {"id": 184, "sourceNumber": 184, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "直升机重量效率的定义？", "answer": "即有效载荷和燃油（动力电池）之和与直升机总重的比值。"}, {"id": 185, "sourceNumber": 185, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "机翼的形状参数有哪些（固定翼）", "answer": "机翼的形状主要是指机翼的翼型、机翼的平面形状、机翼相对机身的位置等。"}, {"id": 186, "sourceNumber": 186, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "机翼焦点的定义（固定翼）", "answer": "当机翼迎角改变时，机翼的升力也要变化。焦点就是当迎角改变时，机翼附加升力(ΔY)的作用点，焦点处机翼的俯仰力矩大小不变。"}, {"id": 187, "sourceNumber": 187, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "直升机合理桨速应如何计算？", "answer": "应该是马达最大扭力时的发动机转速除以减速比。"}, {"id": 188, "sourceNumber": 188, "section": "二、飞行理论（含轴系、飞控、操纵等）", "question": "挥舞铰的作用是什么？（直升机）", "answer": "铰接式旋翼在斜流中通过挥舞铰的挥舞运动自动调节桨叶的拉力，使各方位角处绕挥舞铰的拉力力矩保持平衡，消除气流不对称可能引起的旋翼侧倾力矩。"}, {"id": 189, "sourceNumber": 189, "section": "第三部分：动力系统", "question": "按你的理解，起飞重量1公斤，飞行10分钟的四轴配多大电机、多大桨、多大电池、为什么？", "answer": "答案示例:2210、11×4、3S2200mAH"}, {"id": 190, "sourceNumber": 190, "section": "第三部分：动力系统", "question": "直升机的动力系统通常采用以下三类：电动机，活塞发动机，涡轮轴发动机，请简述其各自的特点", "answer": "电动直升机的伺服特性较好，使用维护方便，但受限于电池的能量密度，通常起飞重量较小通常在20kg以下，续航时间较短，通常在30min以内。采用活塞发动机的直升机重量在20-1000kg之间，耗油率较低，续航时间较长，可达3-5小时。采用涡轮轴发动机的直升机通常起飞重量在2000kg以上，其耗油率较高，功率较大。"}, {"id": 191, "sourceNumber": 191, "section": "第三部分：动力系统", "question": "简述涡轮轴发动机的工作原理。", "answer": "压气机将空气压缩，高压空气与燃油在燃烧室内燃烧，推动涡轮高速转动，涡轮带动压气机和输出轴转动，形成循环，输出扭矩。"}, {"id": 192, "sourceNumber": 192, "section": "第三部分：动力系统", "question": "固定翼螺旋桨转速随油门增加而增加，是否随速度的增加而增加？为什么？", "answer": "是，速度增加，前方来流相对螺旋桨桨叶运动，使螺旋桨桨叶有效攻角减小，阻力系数减小，转速增加。"}, {"id": 193, "sourceNumber": 193, "section": "第三部分：动力系统", "question": "飞机在爬升过程中，恒速螺旋桨的桨矩角是增加还是减小？为什么？（固定翼）", "answer": "增加，因为随着高度的增加，空气密度减小，螺旋桨阻力变小，转速会增加，恒速螺旋桨会自动增加桨矩来降低转速。11.通常发动机的化油器上有几颗螺丝（油针）用于调整发动机的工作状态？其作用分别是什么？答：三颗，①锥体螺丝，又名怠速螺丝，调整发动机在怠速时的转速。②L螺丝，为副油针，③H螺丝，为主油针。在低转速时，主要由副油针调整油气混合比，主油针作用较小。中速时，两个油针相互配合。高转速时，由主油针调整油气混合比，副油针作用较小。"}, {"id": 194, "sourceNumber": 194, "section": "第四部分：飞行器平台", "question": "固定翼前三点式起落架和后三点式起落架有什么不同，各需注意什么？（固定翼）", "answer": "前三点滑跑稳定，前轮小，对跑道要求高，前轮易损；主轮不能太靠后，否则机头难以拉起，主轮最好内八字布置。后三点低速滑跑控制较难，容易甩尾，但皮实耐造；主轮不能太靠前，否则容易拿大顶，主轮最好内八字布置。"}, {"id": 195, "sourceNumber": 195, "section": "第四部分：飞行器平台", "question": "分别描述有边框、无边框、水平折叠、垂直折叠、自动收放脚架、机身整体变形几类多轴飞行器结构、原理与特点？是否能说出典型的飞行器？", "answer": "略。"}, {"id": 196, "sourceNumber": 196, "section": "第四部分：飞行器平台", "question": "直升机的主要技术指标包括那些？", "answer": "发动机功率，旋翼直径，旋翼转速，最大起飞重量，任务载荷重量，续航时间，巡航速度，最大平飞速度，有地效悬停高度、无地效悬停高度、使用升限、回避区等"}, {"id": 197, "sourceNumber": 197, "section": "第四部分：飞行器平台", "question": "共轴式直升机有什么特点？", "answer": "共轴式直升机的主要特点是悬停效率高，无尾桨，无须为平衡旋翼的扭矩而消耗功率，从而结构紧凑，停放面积小，重量效率高，整机空气动力对称，具有较大的爬升率和使用升限。但前飞废阻力面积大，速度性能较差。"}, {"id": 198, "sourceNumber": 198, "section": "第四部分：飞行器平台", "question": "为什么直升机的周期变距要提前90度操纵？（直升机）", "answer": "旋转的桨叶与陀螺类似，由于陀螺效应，力的作用在90度相位后达到最大，因此周期变距需要提前90度操纵。也可具体按课本桨距与挥舞的相关理论解释。"}, {"id": 199, "sourceNumber": 199, "section": "第四部分：飞行器平台", "question": "若增大同一架直升机主旋翼的尺寸，对飞行器的结构和飞行性能的影响是什么？（直升机）", "answer": "增加了飞行器的重量。螺旋桨阻力增大，需要发动机输出更大的功率。螺旋桨产生的反扭矩力增大，同时需要增大尾桨的尺寸或转速来抵消反扭矩力。地面效应增强，在空中飞行的机动性变弱。"}, {"id": 200, "sourceNumber": 200, "section": "第五部分：正常操作程序与应急处置", "question": "模拟讲解固定翼无人机遥控状态下动力失效具体处理方法？（固定翼）", "answer": "答案要点:少推杆，保持速度，建立下滑线，迫降。"}, {"id": 201, "sourceNumber": 201, "section": "第五部分：正常操作程序与应急处置", "question": "模拟讲解无人直升机遥控状态下动力失效具体处理方法？（直升机）", "answer": "答案要点:打负螺距，保持甚至加速旋翼转速，高速下降，接近3-5米高度，将螺距变到最大，自旋降落。"}, {"id": 202, "sourceNumber": 202, "section": "第五部分：正常操作程序与应急处置", "question": "怎样教新学员飞行，为什么？", "answer": "教新学员，第一教油门，因为是起飞的基础，第二教升降，因为起飞对尾，学习升降控制飞机保护自己，第三教副翼，可以控制飞机在一定范围内。最后教方向，结合其他通道完成动作。"}, {"id": 203, "sourceNumber": 203, "section": "第五部分：正常操作程序与应急处置", "question": "三叶桨与两叶桨的区别和各自优点？", "answer": "两叶桨；操纵灵敏度比较慢，平稳，效率高，载重大。省电，一般用在工业无人机，大载荷飞机。三叶桨；操纵灵敏度反映快，速度快，机动性好，费电，一般用在航模和竞技穿越机。\n25.，锂离子电池锂铁电池镍氢电池重量\n答：中大小 容量大中小 寿命短长中"}, {"id": 204, "sourceNumber": 204, "section": "第五部分：正常操作程序与应急处置", "question": "捷联惯性导航行，PID卡尔曼滤波遥控器上什么是模拟控制量、开关控制量，一般用来干什么？", "answer": "第一问答案要点:杆、钮等连续的是模拟量，拨动的是开关控制量。第二问答案要点:模拟用来操作姿态、舵面或设备连续动作，开关用来控制模式切换、开伞、一键返航等。"}];
+const STORAGE_KEY='oralQuizState_v2_memory_xunfei';
+const OLD_STORAGE_KEYS=[STORAGE_KEY,'oralQuizState'];
+function loadState(){
+  for(const key of OLD_STORAGE_KEYS){
+    try{let raw=localStorage.getItem(key); if(raw) return JSON.parse(raw)||{};}catch(e){}
+  }
+  return {};
+}
+let state = loadState();
+state.groupIndex = Number(state.groupIndex || 0);
+state.mode = state.mode || 'learn';
+state.scoreOk = Number(state.scoreOk || 0);
+state.scoreTotal = Number(state.scoreTotal || 0);
+state.quizOrder = Array.isArray(state.quizOrder) ? state.quizOrder : [];
+state.quizPos = Number(state.quizPos || 0);
+state.examPaper = state.examPaper && Array.isArray(state.examPaper.items) ? state.examPaper : null;
+state.examCalcHistory = Array.isArray(state.examCalcHistory) ? state.examCalcHistory.map(Number).filter(Boolean) : [];
+state.learnRevealed = state.learnRevealed || {};
+state.allFocusId = Number(state.allFocusId || 0);
+state.immersiveIndex = Number(state.immersiveIndex || 0);
+state.immersiveIds = Array.isArray(state.immersiveIds) ? state.immersiveIds.map(Number).filter(Boolean) : [];
+state.immersiveDirection = state.immersiveDirection || 'next';
+// 讯飞版：如果浏览器之前保存过旧的配置，这里会自动覆盖为讯飞。
+// 使用本地代理解决 CORS：请先运行 xunfei_proxy.py，然后访问 http://localhost:8765
+const DEEPSEEK_DEFAULT_BASE_URL = 'http://localhost:8765';
+const DEEPSEEK_DEFAULT_API_KEY = '9f8b4124377e7d890de2c2c063e86702:MjliNzk0ZWZjOGMzZTdkNDVjMDY3ZmQz';
+const DEEPSEEK_DEFAULT_MODEL = 'astron-code-latest';
+const AI_KEY_VERSION = 'xunfei-key-2026-05-29';
+const oldAiBase = String(state.aiBaseUrl || '').toLowerCase();
+const oldAiModel = String(state.aiModel || '').toLowerCase();
+// 本次按要求将密钥切换到新的讯飞 Key。使用版本号迁移，避免旧 localStorage 覆盖页面默认配置。
+if (!state.aiBaseUrl || oldAiBase.includes('zhenze-huhehaote') || oldAiBase.includes('cmecloud') || oldAiBase.includes('huanyan')) state.aiBaseUrl = DEEPSEEK_DEFAULT_BASE_URL;
+if (state.aiKeyVersion !== AI_KEY_VERSION) { state.aiApiKey = DEEPSEEK_DEFAULT_API_KEY; state.aiKeyVersion = AI_KEY_VERSION; }
+if (!state.aiModel || oldAiModel.includes('minimax')) state.aiModel = DEEPSEEK_DEFAULT_MODEL;
+state.memoryMode = state.memoryMode !== false;
+state.memory = state.memory || {answers:{}, wrongIds:[], masteredIds:[], groupDone:{}, updatedAt:null};
+state.memory.answers = state.memory.answers || {};
+state.memory.wrongIds = Array.isArray(state.memory.wrongIds) ? state.memory.wrongIds : [];
+state.memory.masteredIds = Array.isArray(state.memory.masteredIds) ? state.memory.masteredIds : [];
+state.memory.groupDone = state.memory.groupDone || {};
+const batchSize=10;
+const app=document.getElementById('app');
+const countPill=document.getElementById('countPill'), groupPill=document.getElementById('groupPill'), scorePill=document.getElementById('scorePill');
+
+/* ===== GSAP 动画工具（按 gsap-skills 推荐：timeline、stagger、transform/autoAlpha、尊重减少动态效果） ===== */
+const motionOK=()=>window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(window.gsap){
+  // Apple HIG 风格：克制、自然、低延迟，优先 transform / opacity，保持 60fps。
+  gsap.defaults({ease:'expo.out', duration:.56, force3D:true});
+  gsap.config({nullTargetWarn:false});
+}
+function applePressFeedback(){
+  document.addEventListener('pointerdown',e=>{
+    const btn=e.target.closest('button');
+    if(btn && motionOK()) gsap.to(btn,{scale:.985,y:1,duration:.09,ease:'power1.out'});
+  },{passive:true});
+  document.addEventListener('pointerup',e=>{
+    const btn=e.target.closest('button');
+    if(btn && motionOK()) gsap.to(btn,{scale:1,y:0,duration:.34,ease:'back.out(2.6)'});
+  },{passive:true});
+}
+function initAppleChrome(){
+  const header=document.querySelector('header');
+  const onScroll=()=>{
+    header?.classList.toggle('is-scrolled', window.scrollY>8);
+    if(motionOK()){
+      gsap.to('body::before',{duration:0});
+      gsap.to('.side',{y:Math.min(window.scrollY*.018,10),duration:.45,ease:'expo.out'});
+    }
+  };
+  onScroll();
+  window.addEventListener('scroll',onScroll,{passive:true});
+  applePressFeedback();
+}
+function animateIntro(){
+  if(!motionOK()) return;
+  gsap.set(['header','.side','.mode-tab button','.hero > div'], {autoAlpha:0, y:-14});
+  gsap.set('.stats .pill',{autoAlpha:0,y:10,scale:.96});
+  const tl=gsap.timeline({defaults:{duration:.72,ease:'expo.out'}});
+  tl.to('header',{autoAlpha:1,y:0})
+    .to('.hero > div',{autoAlpha:1,y:0,stagger:.08},'-=.42')
+    .to('.stats .pill',{autoAlpha:1,y:0,scale:1,stagger:.055},'-=.40')
+    .to('.mode-tab button',{autoAlpha:1,y:0,stagger:.065},'-=.42')
+    .to('.side',{autoAlpha:1,y:0,duration:.78},'-=.48');
+}
+function animateView(){
+  if(!motionOK()) return;
+  const cards=gsap.utils.toArray('#app > .card');
+  const items=gsap.utils.toArray('#app .qa');
+  const targets=[...cards,...items];
+  if(!targets.length) return;
+  gsap.killTweensOf(targets);
+  gsap.fromTo(cards,
+    {autoAlpha:0, y:30, scale:.975, filter:'blur(8px)'},
+    {autoAlpha:1, y:0, scale:1, filter:'blur(0px)', duration:.72, stagger:.055, clearProps:'transform,opacity,visibility,filter'}
+  );
+  gsap.fromTo(items,
+    {autoAlpha:0, y:20, scale:.985},
+    {autoAlpha:1, y:0, scale:1, duration:.55, stagger:{each:.028, from:'start'}, delay:.08, clearProps:'transform,opacity,visibility'}
+  );
+  gsap.fromTo('#app .bigq', {autoAlpha:0, y:14, letterSpacing:'-.07em'}, {autoAlpha:1, y:0, letterSpacing:'-.045em', duration:.62, delay:.10, ease:'expo.out', clearProps:'transform,opacity,visibility'});
+  gsap.fromTo('#app .row button, #app textarea, #app details', {autoAlpha:0, y:8}, {autoAlpha:1, y:0, duration:.42, stagger:.035, delay:.18, clearProps:'transform,opacity,visibility'});
+}
+function animateProgressBar(pct){
+  const bar=document.getElementById('progressBar');
+  if(!bar) return;
+  if(!motionOK()){bar.style.width=pct+'%'; return;}
+  gsap.to(bar,{width:pct+'%', duration:.82, ease:'expo.out'});
+}
+function animateReveal(el){
+  if(!motionOK() || !el) return;
+  gsap.fromTo(el,{autoAlpha:0,y:16,scale:.975,filter:'blur(6px)'},{autoAlpha:1,y:0,scale:1,filter:'blur(0px)',duration:.52,ease:'expo.out',clearProps:'transform,opacity,visibility,filter'});
+}
+function animateScore(){
+  if(!motionOK()) return;
+  gsap.fromTo('#scorePill',{scale:1.10,y:-1},{scale:1,y:0,duration:.42,ease:'back.out(2.4)'});
+}
+
+function save(){try{state.memory.updatedAt=new Date().toISOString();}catch(e){} localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); localStorage.setItem('oralQuizState',JSON.stringify(state));}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function currentBatch(){let start=state.groupIndex*batchSize; return QUESTIONS.slice(start,start+batchSize);}
+function shuffle(a){a=[...a]; for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a;}
+function filtered(){let q=document.getElementById('search').value.trim().toLowerCase(), sec=document.getElementById('sectionFilter').value; return QUESTIONS.filter(x=>(!sec||x.section===sec)&&(!q||(x.question+x.answer).toLowerCase().includes(q)));}
+function updateHeader(){let totalGroups=Math.ceil(QUESTIONS.length/batchSize); countPill.textContent=`题库：${QUESTIONS.length}题`; groupPill.textContent=`第 ${Math.min(state.groupIndex+1,totalGroups)}/${totalGroups} 组`; scorePill.textContent=`得分：${state.scoreOk}/${state.scoreTotal}`; let done=Math.min(state.quizPos,batchSize), pct=(state.mode==='practice'?done/batchSize:0)*100; animateProgressBar(pct); setProgressRing(pct); document.getElementById('progressText').textContent= state.mode==='practice'?`本组已提问 ${done}/${currentBatch().length} 题`:`当前组共 ${currentBatch().length} 题`; updateMemoryStats(); updateChallengeText();}
+function setMode(m){state.mode=m; if(m==='learn') state.quizOrder=[]; save(); render();}
+function renderTabs(){document.getElementById('learnTab').classList.toggle('active',state.mode==='learn'||state.mode==='practice'); document.getElementById('examTab').classList.toggle('active',state.mode==='exam'); document.getElementById('quizTab').classList.toggle('active',state.mode==='random'); document.getElementById('allTab').classList.toggle('active',state.mode==='all'||state.mode==='wrong');}
+function renderLearn(){let batch=currentBatch(); if(!batch.length){app.innerHTML=`<div class="card"><h2>全部完成！</h2><p>你已经刷完所有分组，可以切换到“随机提问”继续复习。</p><button onclick="state.groupIndex=0;setMode('learn')">从第一组重来</button></div>`; return;}
+ app.innerHTML=`<div class="card"><div class="section-title">第 ${state.groupIndex*batchSize+1} - ${state.groupIndex*batchSize+batch.length} 题</div><h2>先背这一组 10 道题</h2><p>建议先自己默答，再点开答案核对。</p><div class="row"><button onclick="startPractice()">我已背完这 10 题，开始随机提问</button><button class="secondary" onclick="nextGroup()">跳到下一组</button></div></div><div class="list">${batch.map((x,i)=>`<div class="qa"><small>#${x.id} ｜ ${esc(x.section)}</small><h3>${i+1}. ${esc(x.question)}</h3><details><summary>查看答案</summary><div class="answer">${esc(x.answer)}</div></details></div>`).join('')}</div>`;}
+function startPractice(){state.mode='practice'; state.quizOrder=shuffle(currentBatch().map(x=>x.id)); state.quizPos=0; save(); render();}
+function renderPractice(){let batch=currentBatch(); if(!state.quizOrder.length) startPractice(); let id=state.quizOrder[state.quizPos], q=QUESTIONS.find(x=>x.id===id); if(!q){finishGroup();return} window.currentPracticeQuestion=q; app.innerHTML=`<div class="card"><small>本组随机提问：${state.quizPos+1}/${batch.length} ｜ 原题 #${q.id}</small><div class="bigq">${esc(q.question)}</div><textarea id="myAnswer" rows="6" placeholder="先在这里默写/口述要点，再点击 AI 判断。也可以显示参考答案后手动核对…" style="width:100%"></textarea><div class="row" style="margin-top:12px"><button id="aiJudgeBtn" onclick="aiJudgeCurrent()">让老师帮我点评</button><button id="showAnswerBtn" class="secondary" onclick="showPracticeAnswer()">显示参考答案</button><button class="secondary" onclick="skipQuestion()">跳过</button></div><div id="aiResult" class="hidden"></div><div id="practiceAnswer" class="hidden"><div class="answer">${esc(q.answer)}</div><p>你觉得自己答对了吗？</p><div class="row"><button class="good" onclick="mark(true)">答对</button><button class="danger" onclick="mark(false)">没答全</button></div></div></div>`; setTimeout(()=>document.getElementById('myAnswer')?.focus(),50);}
+function showPracticeAnswer(){let el=document.getElementById('practiceAnswer'); el.classList.remove('hidden'); animateReveal(el);}
+function skipQuestion(){mark(false)}
+function mark(ok){let q=window.currentPracticeQuestion; if(q && state.memoryMode) recordMemory(q.id, ok); state.scoreTotal++; if(ok){state.scoreOk++; state.streak=Number(state.streak||0)+1; burstConfetti(18); showCoach('答对 +1',`连续答对 ${state.streak} 题，继续保持！`,true);} else {state.streak=0; showCoach('已加入复习提醒','这题先标记为待巩固，回看答案后再刷一遍。',true);} animateScore(); state.quizPos++; if(state.quizPos>=currentBatch().length){finishGroup();} else {save();render();}}
+function recordMemory(id, ok){id=Number(id); let rec=state.memory.answers[id]||{attempts:0,correct:0,wrong:0,history:[]}; rec.attempts++; if(ok) rec.correct++; else rec.wrong++; rec.lastOk=!!ok; rec.lastAt=new Date().toISOString(); rec.history=(rec.history||[]).slice(-9); rec.history.push({ok:!!ok,at:rec.lastAt,groupIndex:state.groupIndex}); state.memory.answers[id]=rec; let wrong=new Set(state.memory.wrongIds||[]); let mastered=new Set(state.memory.masteredIds||[]); if(ok){wrong.delete(id); if(rec.correct>=1) mastered.add(id);} else {wrong.add(id); mastered.delete(id);} state.memory.wrongIds=[...wrong]; state.memory.masteredIds=[...mastered];}
+function updateMemoryStats(){let cb=document.getElementById('memoryMode'); if(cb) cb.checked=!!state.memoryMode; let el=document.getElementById('memoryStats'); if(el){let mastered=(state.memory.masteredIds||[]).length, wrong=(state.memory.wrongIds||[]).length, tried=Object.keys(state.memory.answers||{}).length; el.textContent=`已练 ${tried} 题｜已掌握 ${mastered} 题｜错题 ${wrong} 题`;}}
+function toggleMemoryMode(){state.memoryMode=document.getElementById('memoryMode').checked; save(); updateMemoryStats();}
+function exportMemory(){let data={app:'教员口试背诵练习',version:'memory-v2',exportedAt:new Date().toISOString(),state}; let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='教员口试_记忆备份_'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1000);}
+function importMemoryFile(file){if(!file)return; let reader=new FileReader(); reader.onload=()=>{try{let data=JSON.parse(reader.result); let imported=data.state||data; if(!imported.memory) throw new Error('文件里没有记忆数据'); state={...state,...imported}; state.aiBaseUrl=state.aiBaseUrl||DEEPSEEK_DEFAULT_BASE_URL; state.aiApiKey=state.aiApiKey||DEEPSEEK_DEFAULT_API_KEY; state.aiModel=state.aiModel||DEEPSEEK_DEFAULT_MODEL; state.memoryMode=state.memoryMode!==false; state.memory=state.memory||{answers:{},wrongIds:[],masteredIds:[],groupDone:{}}; state.memory.answers=state.memory.answers||{}; state.memory.wrongIds=state.memory.wrongIds||[]; state.memory.masteredIds=state.memory.masteredIds||[]; save(); alert('记忆数据已导入'); initAiSettings(); render();}catch(e){alert('导入失败：'+e.message);}}; reader.readAsText(file,'utf-8');}
+function renderWrongBook(){let ids=state.memory.wrongIds||[]; let list=ids.map(id=>QUESTIONS.find(q=>q.id==id)).filter(Boolean); if(!list.length){app.innerHTML=`<div class="card"><h2>错题本是空的</h2><p>练习时答错或没答全的题，会自动进入这里。</p><button onclick="setMode('learn')">回到背诵</button></div>`; return;} app.innerHTML=`<div class="card"><h2>错题复习</h2><p>当前错题 ${list.length} 道。答对后会自动移出错题本。</p><div class="row"><button onclick="startWrongPractice()">随机练错题</button><button class="secondary" onclick="setMode('learn')">回到背诵</button></div></div><div class="list">${list.map(x=>`<div class="qa"><small>#${x.id} ｜ ${esc(x.section)}</small><h3>${esc(x.question)}</h3><details><summary>查看答案</summary><div class="answer">${esc(x.answer)}</div></details></div>`).join('')}</div>`;}
+function startWrongPractice(){let ids=shuffle(state.memory.wrongIds||[]); if(!ids.length){setMode('wrong');return;} state.mode='practice'; state.quizOrder=ids; state.quizPos=0; save(); render();}
+
+function normalizeBaseUrl(u){return String(u||'').trim().replace(/\/$/,'').replace(/\/v1$/,'').replace(/\/chat\/completions$/,'').replace(/\/v1\/chat\/completions$/,'');}
+function chatCompletionsUrl(baseUrl){return normalizeBaseUrl(baseUrl) + '/chat/completions';}
+function getAiSettings(){return {baseUrl:normalizeBaseUrl(document.getElementById('aiBaseUrl')?.value||state.aiBaseUrl), apiKey:(document.getElementById('aiApiKey')?.value||state.aiApiKey||'').trim(), model:(document.getElementById('aiModel')?.value||state.aiModel||'').trim()};}
+function saveAiSettings(){let cfg=getAiSettings(); state.aiBaseUrl=cfg.baseUrl; state.aiApiKey=cfg.apiKey; state.aiModel=cfg.model; save(); alert('AI 设置已保存');}
+function useDeepSeekDefaults(){state.aiBaseUrl=DEEPSEEK_DEFAULT_BASE_URL; state.aiApiKey=DEEPSEEK_DEFAULT_API_KEY; state.aiModel=DEEPSEEK_DEFAULT_MODEL; state.aiKeyVersion=AI_KEY_VERSION; state.isXunfei=true; save(); initAiSettings(); alert('已切换为讯飞默认配置');}
+function initAiSettings(){let b=document.getElementById('aiBaseUrl'), k=document.getElementById('aiApiKey'), m=document.getElementById('aiModel'), btn=document.getElementById('saveAiBtn'); if(b)b.value=state.aiBaseUrl||''; if(k)k.value=state.aiApiKey||''; if(m)m.value=state.aiModel||''; if(btn){btn.onclick=saveAiSettings; if(!document.getElementById('deepseekDefaultBtn')){let reset=document.createElement('button'); reset.id='deepseekDefaultBtn'; reset.type='button'; reset.className='secondary'; reset.style.marginTop='8px'; reset.textContent='一键切换 讯飞'; reset.onclick=useDeepSeekDefaults; btn.insertAdjacentElement('afterend', reset);}}}
+function stripJsonFence(t){return String(t||'').replace(/^```(?:json)?\s*/i,'').replace(/```$/,'').trim();}
+const HUMAN_TEACHER_JUDGE_PROMPT = `你是一位有经验、会现场带学生的无人机教员口试老师，不是冷冰冰的机器阅卷员。你的任务是像真人老师一样评分：既看参考答案要点，也看学生是否真正理解、表达是否顺畅、逻辑是否说得通。
+
+评分原则：
+1. 不要求逐字背诵。学生用自己的话说清楚核心意思，应当认可。
+2. 先抓关键要点，再看表达完整度。小口误、顺序不同、措辞不同，不要过度扣分。
+3. 对口试回答要有人情味：指出答得好的地方，再温和指出缺漏，并告诉学生下一次怎么说会更像考场答案。
+4. 不要只写“对/错”。要像老师点评：肯定、提醒、补充、鼓励。
+5. 75分及以上 passed=true；60-74分表示接近通过但还要补充；0-59分表示关键点缺失或概念明显错误。
+6. 遇到计算题：重点看公式、过程、单位和最终结果。结果正确但过程略简可给高分；思路正确但小数/单位小错可酌情给分；关键数值或公式错则不通过。
+7. 如果学生答案很短但命中了核心，可给70-85；如果说得不标准但方向对，要指出“口试时建议补一句……”。
+
+只输出 JSON，不要 Markdown，不要额外解释。JSON 字段必须为：
+{
+  "score": 数字0-100,
+  "passed": 布尔值,
+  "correct_points": 数组，列出学生已经答到的要点,
+  "missing_points": 数组，列出还缺什么或哪里说得不准确,
+  "comment": 字符串，用真人教员语气点评，先肯定再指出问题,
+  "suggestion": 字符串，给一段可直接背诵/改进的建议
+}`;
+function renderAiResult(data, raw){let box=document.getElementById('aiResult'); let score=Number(data.score??0); let passed=!!data.passed; let cls= passed?'ai-box':(score>=60?'ai-box warn':'ai-box bad'); let miss=Array.isArray(data.missing_points)?data.missing_points.join('\n- '):(data.missing_points||''); let good=Array.isArray(data.correct_points)?data.correct_points.join('\n- '):(data.correct_points||''); box.className=cls; box.innerHTML=`<b>教员点评：${passed?'可以通过':'还需补充'} ｜ ${score}/100</b>\n\n${data.comment?esc(data.comment)+'\n\n':''}${good?'<b>已答到：</b>\n- '+esc(good)+'\n\n':''}${miss?'<b>遗漏/需补充：</b>\n- '+esc(miss)+'\n\n':''}${data.suggestion?'<b>老师建议这样改：</b>\n'+esc(data.suggestion):''}<div class="row" style="margin-top:12px"><button class="good" onclick="mark(${passed})">采纳 AI 判定并下一题</button><button class="secondary" onclick="showPracticeAnswer()">查看参考答案</button><button class="secondary" onclick="mark(true)">我认为答对</button><button class="secondary" onclick="mark(false)">我认为没答全</button></div>`; box.classList.remove('hidden'); animateReveal(box);}
+async function aiJudgeCurrent(){let q=window.currentPracticeQuestion; let userAnswer=document.getElementById('myAnswer')?.value.trim(); let box=document.getElementById('aiResult'); if(!userAnswer){alert('请先输入你的答案，再让 AI 判断。'); return;} let cfg=getAiSettings(); if(!cfg.baseUrl||!cfg.apiKey||!cfg.model){alert('请先在左侧填写并保存 API 地址、API Key 和模型名。'); return;} state.aiBaseUrl=cfg.baseUrl; state.aiApiKey=cfg.apiKey; state.aiModel=cfg.model; save(); let btn=document.getElementById('aiJudgeBtn'); btn.disabled=true; btn.textContent='老师点评中…'; box.className='ai-box warn'; box.textContent='正在按真人教员口试标准点评…'; box.classList.remove('hidden'); try{let messages=[{role:'system',content:HUMAN_TEACHER_JUDGE_PROMPT},{role:'user',content:`题目：${q.question}\n\n参考答案：${q.answer}\n\n学生答案：${userAnswer}\n\n请从真人教员口试老师角度判断学生答案是否能通过，并给出有人情味、可执行的点评。`}]; let res=await fetch(chatCompletionsUrl(cfg.baseUrl),{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.apiKey},body:JSON.stringify({model:cfg.model,messages,temperature:0.35,stream:false})}); if(!res.ok){let text=await res.text(); throw new Error('接口返回 '+res.status+'：'+text.slice(0,500));} let json=await res.json(); let content=json.choices?.[0]?.message?.content||json.choices?.[0]?.text||''; let data; try{data=JSON.parse(stripJsonFence(content));}catch(e){data={score:0,passed:false,comment:'AI 返回内容不是标准 JSON：'+content,missing_points:['请检查模型是否支持 OpenAI Chat Completions 与 JSON 输出。'],suggestion:'可以先显示参考答案手动核对。'};} renderAiResult(data, content);}catch(err){box.className='ai-box bad'; box.innerHTML='<b>AI 判断失败</b>\n\n'+esc(err.message||err)+'\n\n请检查：API 地址是否能访问、模型名是否正确、Key 是否有效。若显示 Failed to fetch / CORS，是浏览器直接请求接口被拦截，需要用本地/云端代理。<div class="row" style="margin-top:12px"><button class="secondary" onclick="showPracticeAnswer()">改为手动核对</button></div>'; }finally{btn.disabled=false; btn.textContent='让老师帮我点评';}}
+
+async function requestAiJudge(q,userAnswer){
+  let cfg=getAiSettings();
+  if(!cfg.baseUrl||!cfg.apiKey||!cfg.model) throw new Error('请先在左侧填写并保存 API 地址、API Key 和模型名。');
+  state.aiBaseUrl=cfg.baseUrl; state.aiApiKey=cfg.apiKey; state.aiModel=cfg.model; save();
+  let messages=[
+    {role:'system',content:HUMAN_TEACHER_JUDGE_PROMPT},
+    {role:'user',content:`题目：${q.question}\n\n参考答案：${q.answer}\n\n学生答案：${userAnswer}\n\n请从真人教员口试老师角度判断学生答案是否能通过，并给出有人情味、可执行的点评。`}
+  ];
+  let res=await fetch(chatCompletionsUrl(cfg.baseUrl),{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.apiKey},body:JSON.stringify({model:cfg.model,messages,temperature:0.35,stream:false})});
+  if(!res.ok){let text=await res.text(); throw new Error('接口返回 '+res.status+'：'+text.slice(0,500));}
+  let json=await res.json();
+  let content=json.choices?.[0]?.message?.content||json.choices?.[0]?.text||'';
+  try{return JSON.parse(stripJsonFence(content));}
+  catch(e){return {score:0,passed:false,comment:'AI 返回内容不是标准 JSON：'+content,missing_points:['请检查模型是否支持 OpenAI Chat Completions 与 JSON 输出。'],suggestion:'可显示参考答案手动核对。'};}
+}
+function renderExamResultCard(r){
+  if(!r) return '';
+  let score=Number(r.score??0), passed=!!r.passed;
+  let cls=passed?'ai-box':(score>=60?'ai-box warn':'ai-box bad');
+  let miss=Array.isArray(r.missing_points)?r.missing_points.join('\n- '):(r.missing_points||'');
+  let good=Array.isArray(r.correct_points)?r.correct_points.join('\n- '):(r.correct_points||'');
+  return `<div class="${cls}"><b>教员点评：${passed?'可以通过':'还需补充'} ｜ ${score}/100</b>\n\n${r.comment?esc(r.comment)+'\n\n':''}${good?'<b>已答到：</b>\n- '+esc(good)+'\n\n':''}${miss?'<b>遗漏/需补充：</b>\n- '+esc(miss)+'\n\n':''}${r.suggestion?'<b>老师建议这样改：</b>\n'+esc(r.suggestion):''}</div>`;
+}
+async function gradeExamWithAI(){
+  if(!state.examPaper) return;
+  let items=state.examPaper.items.map(it=>({...it,q:QUESTIONS.find(q=>q.id===it.id)})).filter(x=>x.q);
+  let answers=[...document.querySelectorAll('.exam-answer')].map(x=>x.value.trim());
+  if(answers.length<5 || answers.some(a=>!a)){alert('请先答完 5 道题，再交给 AI 打分。'); return;}
+  let btn=document.getElementById('examAiBtn'), box=document.getElementById('examSummary');
+  btn.disabled=true; btn.textContent='老师正在逐题点评…';
+  box.className='ai-box warn'; box.textContent='正在按真人教员口试标准逐题点评…'; box.classList.remove('hidden');
+  try{
+    let results=[];
+    for(let i=0;i<items.length;i++){
+      box.textContent=`老师正在点评第 ${i+1}/5 题…`;
+      let data=await requestAiJudge(items[i].q, answers[i]);
+      data.answer=answers[i]; data.type=items[i].type; data.questionId=items[i].q.id;
+      results.push(data);
+    }
+    let passCount=results.filter(r=>r.passed).length;
+    state.examPaper.results=results;
+    state.examPaper.answers=answers;
+    state.examPaper.revealed=true;
+    state.examPaper.passCount=passCount;
+    state.examPaper.qualified=passCount>=3;
+    save(); render();
+  }catch(err){
+    box.className='ai-box bad';
+    box.innerHTML='<b>教员式点评失败</b>\n\n'+esc(err.message||err)+'\n\n请检查 API 地址、Key、模型名，或改为显示参考答案手动核对。';
+  }finally{btn.disabled=false; btn.textContent='教员式交卷点评';}
+}
+
+function finishGroup(){state.memory.groupDone[state.groupIndex]=new Date().toISOString(); burstConfetti(70); showCoach('本组完成','这一组已练完，可以进入下一组，也可以重练巩固。',false); save(); app.innerHTML=`<div class="card"><h2>这一组练完了 🎉</h2><p>本组 10 道题已经随机提问完成。可以进入下一组，或重练本组。</p><div class="row"><button onclick="nextGroup()">进入下一组</button><button class="secondary" onclick="startPractice()">重练本组</button><button class="secondary" onclick="setMode('learn')">回看本组</button></div></div>`; save(); updateHeader(); requestAnimationFrame(animateView);}
+function nextGroup(){state.groupIndex++; state.mode='learn'; state.quizOrder=[]; state.quizPos=0; save(); render();}
+
+// 考试模式计算题题库：只抽“需要代入公式、换算、估算、比较数值”的题，扩大题池并避免连续重复。
+const CALC_QUESTION_IDS = new Set([
+  22,
+  61,
+  63,
+  64,
+  104,
+  105,
+  122,
+  187,
+  189
+]);
+const CALC_QUESTION_KEYWORDS = [
+  '使用16000mAh、6S动力电池的4旋翼稳定悬停',
+  '6S10000mah，搭配100KV的电机与3S20000mah搭配300KV',
+  '5000mAh，20C锂电池',
+  '最大放电电流',
+  '3S2P代表什么含义',
+  '理论航时',
+  '理论多少h充满',
+  '除以减速比',
+  '估算这些力的大小',
+  '起飞重量1公斤，飞行10分钟'
+];
+function isCalcQuestion(q){
+  const text=(q.question+' '+q.answer).replace(/\s+/g,'');
+  if(CALC_QUESTION_IDS.has(Number(q.id))) return true;
+  return CALC_QUESTION_KEYWORDS.some(k=>text.includes(k.replace(/\s+/g,'')));
+}
+function difficultyScore(q){let t=q.question+' '+q.answer; let score=t.length; if(/简述|具体讲述|模拟讲解|描述|如何|为什么|区别|原理|处理|哪些|最低写10个/.test(q.question)) score+=90; if((q.answer.match(/；|。|\n|①|②|③|④|⑤|\(\d\)/g)||[]).length>=3) score+=80; return score;}
+function buildExamPaper(){
+  let source=filtered(); if(source.length<5) source=QUESTIONS;
+  // 计算题只从指定的“需要计算/给出参数与结果”的题目中抽取，避免把所有带数字、单位的普通题误判为计算题。
+  let calc=shuffle(source.filter(isCalcQuestion));
+  if(calc.length<1) calc=shuffle(QUESTIONS.filter(isCalcQuestion));
+  const recentCalc = new Set((state.examCalcHistory || []).slice(-8));
+  const freshCalc = calc.filter(q=>!recentCalc.has(Number(q.id)));
+  if(freshCalc.length) calc = freshCalc.concat(calc.filter(q=>recentCalc.has(Number(q.id))));
+  let nonCalc=source.filter(q=>!isCalcQuestion(q));
+  let easy=shuffle(nonCalc.filter(q=>difficultyScore(q)<170));
+  let hard=shuffle(nonCalc.filter(q=>difficultyScore(q)>=170));
+  if(easy.length<2) easy=shuffle(nonCalc).sort((a,b)=>difficultyScore(a)-difficultyScore(b));
+  if(hard.length<2) hard=shuffle(nonCalc).sort((a,b)=>difficultyScore(b)-difficultyScore(a));
+  let used=new Set();
+  function take(pool,type){let q=pool.find(x=>!used.has(x.id)) || source.find(x=>!used.has(x.id)); if(q) used.add(q.id); return q?{id:q.id,type}:null;}
+  let items=[take(easy,'简单题'),take(easy,'简单题'),take(hard,'困难题'),take(hard,'困难题'),take(calc,'计算题')].filter(Boolean);
+  const calcItem = items.find(it=>it.type==='计算题');
+  if(calcItem){
+    state.examCalcHistory = [...(state.examCalcHistory||[]), Number(calcItem.id)].slice(-12);
+  }
+  state.examPaper={items, createdAt:new Date().toISOString(), revealed:false}; save();
+}
+function startExam(){buildExamPaper(); state.mode='exam'; save(); render();}
+function showExamAnswers(){ if(!state.examPaper) return; state.examPaper.revealed=true; save(); render(); }
+function renderExam(){
+  if(!state.examPaper || !Array.isArray(state.examPaper.items) || state.examPaper.items.length<5) buildExamPaper();
+  let items=state.examPaper.items.map(it=>({...it, q:QUESTIONS.find(q=>q.id===it.id)})).filter(x=>x.q);
+  let results=state.examPaper.results||[];
+  let passCount=Number(state.examPaper.passCount||0);
+  let summary=results.length?`<div id="examSummary" class="${state.examPaper.qualified?'ai-box':'ai-box bad'}"><b>考试结果：${state.examPaper.qualified?'合格':'不合格'} ｜ 通过 ${passCount}/5 题</b>\n\n规则：5 道题中通过 3 道即合格。</div>`:`<div id="examSummary" class="hidden"></div>`;
+  app.innerHTML=`<div class="card"><small>考试模式 ｜ 2 道简单题 + 2 道困难题 + 1 道计算题</small><h2>模拟口试试卷</h2><p>计算题会从扩展后的计算题题库中抽取，包括航时/电压/充电、放电倍率、KV转速比较、爬升下降时间估算、旋翼受力估算、桨速计算、1kg四轴配置估算等；系统会优先避开最近抽过的计算题，减少连续重复。答完 5 道题后点击“教员式交卷点评”，通过 3 道及以上即为合格。</p><div class="row"><button onclick="startExam()">重新抽一套</button><button id="examAiBtn" onclick="gradeExamWithAI()">教员式交卷点评</button><button class="secondary" onclick="showExamAnswers()">只显示参考答案</button><button class="secondary" onclick="window.print()">打印试卷</button></div>${summary}</div><div class="list">${items.map((it,i)=>`<div class="qa exam-item"><small>${it.type} ｜ 第 ${i+1}/5 题 ｜ 原题 #${it.q.id}</small><h3>${esc(it.q.question)}</h3><textarea class="exam-answer" rows="5" placeholder="在这里作答…" style="width:100%;margin-top:10px">${esc((state.examPaper.answers||[])[i]||'')}</textarea>${results[i]?renderExamResultCard(results[i]):''}${state.examPaper.revealed?`<div class="answer"><b>参考答案：</b>\n${esc(it.q.answer)}</div>`:`<details><summary>单独查看本题答案</summary><div class="answer">${esc(it.q.answer)}</div></details>`}</div>`).join('')}</div>`;
+}
+
+
+function renderRandom(){let pool=filtered(); let q=pool[Math.floor(Math.random()*pool.length)]||QUESTIONS[0]; app.innerHTML=`<div class="card"><small>全题库随机 ｜ 共 ${pool.length} 题可选</small><div class="bigq">${esc(q.question)}</div><textarea rows="5" placeholder="先回答，再显示答案…" style="width:100%"></textarea><div class="row" style="margin-top:12px"><button onclick="document.getElementById('ra').classList.remove('hidden')">显示答案</button><button class="secondary" onclick="renderRandom()">换一题</button></div><div id="ra" class="answer hidden">${esc(q.answer)}</div></div>`;}
+function renderAll(){let list=filtered(); app.innerHTML=`<div class="card"><h2>完整题库浏览</h2><p>当前显示 ${list.length} / ${QUESTIONS.length} 题。点某题的“从此题沉浸刷题”，可用键盘 ←/→ 切换上一题/下一题，按 Esc 退出；退出后页面会停在退出时的题目。</p></div><div class="list">${list.map(x=>`<div class="qa" id="qa-${x.id}" data-qid="${x.id}"><small>#${x.id} ｜ ${esc(x.section)}</small><h3>${esc(x.question)}</h3><div class="row" style="margin:8px 0 4px"><button class="secondary tiny-btn" onclick="startImmersiveFrom(${x.id})">从此题沉浸刷题</button></div><details><summary>查看答案</summary><div class="answer">${esc(x.answer)}</div></details></div>`).join('')}</div>`; if(state.allFocusId){setTimeout(()=>scrollAllToQuestion(state.allFocusId),80);}}
+
+function scrollAllToQuestion(id){
+  const el=document.getElementById('qa-'+id);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.style.borderColor='rgba(0,122,255,.52)';
+  el.style.boxShadow='0 22px 58px rgba(0,122,255,.16),0 1px 0 rgba(255,255,255,.78) inset';
+  setTimeout(()=>{el.style.borderColor=''; el.style.boxShadow='';},1600);
+}
+function startImmersiveFrom(id){
+  const list=filtered();
+  state.immersiveIds=(list.length?list:QUESTIONS).map(x=>x.id);
+  let idx=state.immersiveIds.indexOf(Number(id));
+  if(idx<0) idx=0;
+  state.immersiveIndex=idx;
+  state.allFocusId=state.immersiveIds[idx]||Number(id)||0;
+  state.immersiveDirection='next';
+  save();
+  updateImmersiveView();
+  document.body.classList.add('immersive-active');
+  if(window.gsap && motionOK()){
+    gsap.fromTo('.immersive-view',{opacity:0,scale:0.93},{opacity:1,scale:1,duration:.5,ease:'power3.out'});
+  }
+  updateImmersiveProgress();
+}
+function currentImmersiveQuestion(){
+  const ids=Array.isArray(state.immersiveIds)&&state.immersiveIds.length?state.immersiveIds:QUESTIONS.map(x=>x.id);
+  state.immersiveIndex=Math.max(0,Math.min(ids.length-1,Number(state.immersiveIndex)||0));
+  return QUESTIONS.find(x=>x.id===ids[state.immersiveIndex])||QUESTIONS[0];
+}
+function updateImmersiveProgress(){
+  const pg=document.getElementById('immersiveProgress');
+  if(!pg) return;
+  const ids=Array.isArray(state.immersiveIds)&&state.immersiveIds.length?state.immersiveIds:QUESTIONS.map(x=>x.id);
+  const n=ids.length;
+  if(n<=1){pg.innerHTML='';return;}
+  const idx=state.immersiveIndex||0;
+  pg.innerHTML=ids.map((_,i)=>
+    `<span class="immersive-progress-dot${i===idx?' active':''}"></span>`
+  ).join('');
+}
+function updateImmersiveView(){
+  const q=currentImmersiveQuestion();
+  if(!q) return;
+  state.allFocusId=q.id;
+  const questionEl=document.getElementById('immersiveQuestion');
+  const answerEl=document.getElementById('immersiveAnswer');
+  if(questionEl) questionEl.textContent=q.question||'';
+  if(answerEl) answerEl.textContent=q.answer||'';
+  save();
+  updateImmersiveProgress();
+  if(window.gsap && motionOK()){
+    const dir=state.immersiveDirection||'next';
+    const xFrom=dir==='next'?40:-40;
+    gsap.fromTo('#immersiveQuestion',
+      {opacity:0,x:xFrom,scale:0.96},
+      {opacity:1,x:0,scale:1,duration:.42,ease:'power3.out',clearProps:'transform,opacity'}
+    );
+    gsap.fromTo('#immersiveAnswer',
+      {opacity:0,x:xFrom,scale:0.96},
+      {opacity:1,x:0,scale:1,duration:.42,ease:'power3.out',delay:.1,clearProps:'transform,opacity'}
+    );
+  }
+}
+function immersiveNext(){
+  const ids=Array.isArray(state.immersiveIds)&&state.immersiveIds.length?state.immersiveIds:QUESTIONS.map(x=>x.id);
+  const prevIdx=(Number(state.immersiveIndex)||0);
+  if(prevIdx>=ids.length-1){
+    boundaryShake();
+    return;
+  }
+  state.immersiveIndex=prevIdx+1;
+  state.immersiveDirection='next';
+  updateImmersiveView();
+}
+function immersivePrev(){
+  const prevIdx=(Number(state.immersiveIndex)||0);
+  if(prevIdx<=0){
+    boundaryShake();
+    return;
+  }
+  state.immersiveIndex=prevIdx-1;
+  state.immersiveDirection='prev';
+  updateImmersiveView();
+}
+function boundaryShake(){
+  const shell=document.querySelector('.immersive-shell');
+  if(!shell || !window.gsap || !motionOK()) return;
+  gsap.fromTo(shell,{x:0},{x:6,duration:.06,ease:'power2.out',yoyo:true,repeat:3,clearProps:'x'});
+}
+function exitImmersive(){
+  const q=currentImmersiveQuestion();
+  if(q) state.allFocusId=q.id;
+  state.mode='all';
+  save();
+  document.body.classList.remove('immersive-active');
+  if(window.gsap && motionOK()){
+    gsap.to('.immersive-view',{opacity:0,scale:0.93,y:-12,duration:.38,ease:'power3.in',onComplete:()=>{render();}});
+  }else{
+    render();
+  }
+}
+
+function render(){renderTabs(); updateHeader(); if(state.mode==='learn')renderLearn(); else if(state.mode==='practice')renderPractice(); else if(state.mode==='exam')renderExam(); else if(state.mode==='random')renderRandom(); else if(state.mode==='wrong')renderWrongBook(); else renderAll(); updateHeader(); requestAnimationFrame(animateView);}
+
+/* ===== 新增互动逻辑：鼠标光晕、按钮水波纹、进度环、练习助手、庆祝彩纸 ===== */
+function setProgressRing(pct){
+  const ring=document.getElementById('progressRing'), txt=document.getElementById('ringText');
+  pct=Math.max(0,Math.min(100,Math.round(Number(pct)||0)));
+  if(ring) ring.style.setProperty('--ring', (pct*3.6)+'deg');
+  if(txt) txt.textContent=pct+'%';
+}
+function updateChallengeText(){
+  const el=document.getElementById('challengeText');
+  if(!el) return;
+  const totalGroups=Math.ceil(QUESTIONS.length/batchSize);
+  const groupDone=Object.keys(state.memory?.groupDone||{}).length;
+  const streak=Number(state.streak||0);
+  el.textContent=`已完成 ${groupDone}/${totalGroups} 组｜连续答对 ${streak} 题`;
+}
+function showCoach(title,text,autoHide=true){
+  const box=document.getElementById('floatingCoach');
+  if(!box) return;
+  document.getElementById('coachTitle').textContent=title;
+  document.getElementById('coachText').textContent=text;
+  box.classList.add('show');
+  clearTimeout(window.__coachTimer);
+  if(autoHide) window.__coachTimer=setTimeout(()=>box.classList.remove('show'),4200);
+}
+function burstConfetti(amount=36){
+  if(!document.getElementById('celebrateToggle')?.checked) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  for(let i=0;i<amount;i++){
+    const p=document.createElement('i');
+    p.className='confetti-piece';
+    p.style.left=(Math.random()*100)+'vw';
+    p.style.setProperty('--x', ((Math.random()-.5)*220)+'px');
+    p.style.setProperty('--h', Math.floor(Math.random()*360));
+    p.style.animationDelay=(Math.random()*.22)+'s';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),1600);
+  }
+}
+function makeSparkle(x,y){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const s=document.createElement('i');
+  s.className='sparkle';
+  s.style.left=x+'px';
+  s.style.top=y+'px';
+  s.style.setProperty('--sx', ((Math.random()-.5)*90)+'px');
+  s.style.setProperty('--sy', ((Math.random()-.8)*90)+'px');
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),900);
+}
+function initInteractiveEnhancements(){
+  const glow=document.getElementById('cursorGlow');
+  document.addEventListener('pointermove',e=>{
+    if(glow){
+      glow.style.opacity='.9';
+      glow.style.left=e.clientX+'px';
+      glow.style.top=e.clientY+'px';
+    }
+    if(Math.random()<.045) makeSparkle(e.clientX,e.clientY);
+  },{passive:true});
+  document.addEventListener('pointerdown',e=>{
+    const btn=e.target.closest('button');
+    if(!btn) return;
+    btn.classList.add('ripple-on');
+    const r=document.createElement('span');
+    const rect=btn.getBoundingClientRect();
+    r.className='ripple-dot';
+    r.style.left=(e.clientX-rect.left)+'px';
+    r.style.top=(e.clientY-rect.top)+'px';
+    btn.appendChild(r);
+    setTimeout(()=>r.remove(),650);
+  },{passive:true});
+  document.addEventListener('pointermove',e=>{
+    const card=e.target.closest('.qa,.card');
+    if(!card || !motionOK()) return;
+    const rect=card.getBoundingClientRect();
+    const rx=((e.clientY-rect.top)/rect.height-.5)*-3;
+    const ry=((e.clientX-rect.left)/rect.width-.5)*3;
+    gsap.to(card,{rotateX:rx,rotateY:ry,transformPerspective:900,duration:.35,ease:'expo.out'});
+  },{passive:true});
+  document.addEventListener('pointerleave',e=>{
+    const card=e.target?.closest?.('.qa,.card');
+    if(card && motionOK()) gsap.to(card,{rotateX:0,rotateY:0,duration:.45,ease:'expo.out'});
+  },true);
+  document.getElementById('coachHideBtn')?.addEventListener('click',()=>document.getElementById('floatingCoach')?.classList.remove('show'));
+  const focusToggle=document.getElementById('focusModeToggle');
+  const coachFocus=document.getElementById('coachFocusBtn');
+  const setFocus=(on)=>{document.body.classList.toggle('focus-mode',!!on); if(focusToggle) focusToggle.checked=!!on;};
+  focusToggle?.addEventListener('change',e=>setFocus(e.target.checked));
+  coachFocus?.addEventListener('click',()=>setFocus(!document.body.classList.contains('focus-mode')));
+  setTimeout(()=>showCoach('练习助手已启动','支持鼠标光晕、答对庆祝、专注模式和实时进度环。',true),900);
+}
+
+
+function initLiquidGlassButtons(){
+  const layerNames=['liquid-filter-layer','liquid-tint-layer','liquid-edge-layer','liquid-caustic-layer','liquid-shine'];
+  const enhance=(root=document)=>{
+    root.querySelectorAll('button:not([data-liquid-glass])').forEach(btn=>{
+      btn.dataset.liquidGlass='true';
+      btn.classList.add('liquid-glass-btn');
+
+      const content=document.createElement('span');
+      content.className='liquid-content';
+      while(btn.firstChild){ content.appendChild(btn.firstChild); }
+
+      layerNames.forEach(name=>{
+        const layer=document.createElement('span');
+        layer.className=name;
+        layer.setAttribute('aria-hidden','true');
+        btn.appendChild(layer);
+      });
+      btn.appendChild(content);
+    });
+  };
+  enhance();
+
+  const setVars=(btn,e)=>{
+    const rect=btn.getBoundingClientRect();
+    const x=Math.min(1,Math.max(0,(e.clientX-rect.left)/Math.max(1,rect.width)));
+    const y=Math.min(1,Math.max(0,(e.clientY-rect.top)/Math.max(1,rect.height)));
+    btn.style.setProperty('--mx',(x*100).toFixed(2)+'%');
+    btn.style.setProperty('--my',(y*100).toFixed(2)+'%');
+    btn.style.setProperty('--mx-num',x.toFixed(4));
+    btn.style.setProperty('--my-num',y.toFixed(4));
+  };
+
+  document.addEventListener('pointermove',e=>{
+    const btn=e.target.closest?.('button');
+    if(!btn) return;
+    setVars(btn,e);
+    if(window.gsap && motionOK()){
+      const rect=btn.getBoundingClientRect();
+      const dx=((e.clientX-rect.left)/Math.max(1,rect.width)-.5)*8;
+      const dy=((e.clientY-rect.top)/Math.max(1,rect.height)-.5)*6;
+      gsap.to(btn,{x:dx*.26,y:dy*.18,rotateX:-dy*.9,rotateY:dx*.9,transformPerspective:800,duration:.44,ease:'expo.out'});
+    }
+  },{passive:true});
+
+  document.addEventListener('pointerout',e=>{
+    const btn=e.target?.closest?.('button');
+    if(!btn || btn.contains(e.relatedTarget)) return;
+    btn.style.setProperty('--mx','50%');
+    btn.style.setProperty('--my','50%');
+    btn.style.setProperty('--mx-num','.5');
+    btn.style.setProperty('--my-num','.5');
+    if(window.gsap && motionOK()) gsap.to(btn,{x:0,y:0,rotateX:0,rotateY:0,duration:.58,ease:'elastic.out(1,.55)'});
+  },true);
+
+  document.addEventListener('pointerdown',e=>{
+    const btn=e.target.closest?.('button');
+    if(!btn) return;
+    setVars(btn,e);
+    const rect=btn.getBoundingClientRect();
+    const blob=document.createElement('span');
+    blob.className='liquid-blob';
+    blob.style.left=(e.clientX-rect.left)+'px';
+    blob.style.top=(e.clientY-rect.top)+'px';
+    btn.appendChild(blob);
+    setTimeout(()=>blob.remove(),820);
+  },{passive:true});
+
+  new MutationObserver(records=>{
+    for(const record of records){
+      record.addedNodes.forEach(node=>{
+        if(node.nodeType===1) enhance(node);
+      });
+    }
+  }).observe(document.body,{childList:true,subtree:true});
+}
+
+function initSections(){let sel=document.getElementById('sectionFilter'); [...new Set(QUESTIONS.map(x=>x.section))].forEach(s=>{let o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);})}
+document.getElementById('learnTab').onclick=()=>setMode('learn'); document.getElementById('examTab').onclick=()=>{state.mode='exam'; if(!state.examPaper) buildExamPaper(); save(); render();}; document.getElementById('quizTab').onclick=()=>setMode('random'); document.getElementById('allTab').onclick=()=>setMode('all');
+document.getElementById('search').oninput=()=>{ if(state.mode==='all'||state.mode==='random'||state.mode==='exam') render(); }; document.getElementById('sectionFilter').onchange=()=>{ if(state.mode==='all'||state.mode==='random'||state.mode==='exam') render(); };
+document.getElementById('resetBtn').onclick=()=>{ if(confirm('确定清空练习进度和得分？')){localStorage.removeItem('oralQuizState'); localStorage.removeItem(STORAGE_KEY); location.reload();} };
+document.getElementById('memoryMode').onchange=toggleMemoryMode;
+document.getElementById('wrongBookBtn').onclick=()=>setMode('wrong');
+document.getElementById('exportMemoryBtn').onclick=exportMemory;
+document.getElementById('importMemoryBtn').onclick=()=>document.getElementById('memoryImportFile').click();
+document.getElementById('memoryImportFile').onchange=e=>importMemoryFile(e.target.files[0]);
+document.addEventListener('keydown',e=>{ if(document.body.classList.contains('immersive-active')){ if(e.key==='ArrowRight'||e.key==='PageDown'||e.key==='Enter'){e.preventDefault();immersiveNext();} if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();immersivePrev();} if(e.key==='Escape'){e.preventDefault();exitImmersive();} return; } if(state.mode==='practice' && e.code==='Space' && document.activeElement.tagName!=='TEXTAREA'){e.preventDefault();showPracticeAnswer();} if(state.mode==='practice' && e.key==='Enter' && !e.shiftKey && !document.getElementById('practiceAnswer')?.classList.contains('hidden')){e.preventDefault();mark(false);} });
+initSections(); initAiSettings(); updateMemoryStats(); initAppleChrome(); initInteractiveEnhancements(); initLiquidGlassButtons(); animateIntro(); render();
+</script>
+</body>
+</html>
